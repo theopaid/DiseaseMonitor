@@ -24,7 +24,7 @@ void printRecord(patientRecord record) {
 
 typedef struct listNode
 {
-    patientRecord record;
+    patientRecord *record;
     struct listNode *next;
 } listNode;
 
@@ -32,13 +32,13 @@ void printList(listNode *head) {
 
     listNode *current = head;
     while (current != NULL) {
-        printRecord(current->record);
+        printRecord(*(current->record));
         current = current->next;
     }
     
 }
 
-void push(listNode **head, patientRecord *record) {
+void push(listNode **head, patientRecord **record) {
 
     if(*head == NULL) { // list empty
         *head = (listNode *) malloc(sizeof(listNode));
@@ -133,7 +133,7 @@ listNode * storeData(char *patientRecordsFile) {
                 break;
             case 6: // last entry of a record
                 fscanf(fp, "%s", tmpRecordPtr->exitDate);
-                push(&head, tmpRecordPtr);
+                push(&head, &tmpRecordPtr);
                 break;
         }
     }
