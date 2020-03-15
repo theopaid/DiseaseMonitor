@@ -2,31 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef int bool;
-#define true 1;
-#define false 0;
+#include "functions.h"
 
-typedef struct patientRecord
-{
-    char recordID[32];
-    char patientFirstName[32];
-    char patientLastName[32];
-    char diseaseID[32];
-    char country[32];
-    char entryDate[11];
-    char exitDate[11];
-} patientRecord;
 
 void printRecord(patientRecord record) {
 
     printf("%s | %s | %s | %s | %s | %s | %s\n", record.recordID, record.patientFirstName, record.patientLastName, record.diseaseID, record.country, record.entryDate, record.exitDate);
 }
-
-typedef struct listNode
-{
-    patientRecord *record;
-    struct listNode *next;
-} listNode;
 
 void printList(listNode *head) {
 
@@ -142,21 +124,4 @@ listNode * storeData(char *patientRecordsFile) {
     fclose(fp);
 
     return head;
-}
-
-int main (int argc, char *argv[]) {
-
-    if (!validArgs(argc, argv)) {
-        printf("The arguments given are invalid. Try again.\n");
-        return -1;
-    }
-
-    int diseaseHashTableNumOfEntries, countryHashTableNumOfEntries, bucketSize;
-    char *patientRecordsFile;
-    getArgs(&diseaseHashTableNumOfEntries, &countryHashTableNumOfEntries, &bucketSize, &patientRecordsFile, argv);
-
-    listNode *head = storeData(patientRecordsFile); // head of list with records
-    printList(head);
-
-    return 0;
 }
