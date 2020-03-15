@@ -16,11 +16,11 @@ typedef struct Date
 
 typedef struct patientRecord
 {
-    char recordID[32];
-    char patientFirstName[32];
-    char patientLastName[32];
-    char diseaseID[32];
-    char country[32];
+    char *recordID;
+    char *patientFirstName;
+    char *patientLastName;
+    char *diseaseID;
+    char *country;
     Date entryDate;
     Date exitDate;
 } patientRecord;

@@ -77,7 +77,8 @@ void getArgs(int *diseaseHashTableNumOfEntries, int *countryHashTableNumOfEntrie
 listNode * storeData(char *patientRecordsFile) {
 
     listNode *head = NULL;
-    char *tmpDateInfo;
+    char tmpDateInfo[11];
+    char tmpEntryInfo[32];
 
     FILE *fp = fopen(patientRecordsFile, "r");
 
@@ -97,25 +98,39 @@ listNode * storeData(char *patientRecordsFile) {
                 if(tmpRecordPtr == NULL) {
                     exit(-1);
                 }
-                fscanf(fp, "%s", tmpRecordPtr->recordID);
+
+                fscanf(fp, "%s", tmpEntryInfo);
+                tmpRecordPtr->recordID = malloc(sizeof(char) * (strlen(tmpEntryInfo) + 1));
+                strcpy(tmpRecordPtr->recordID, tmpEntryInfo);
+
                 break;
             case 1:
-                fscanf(fp, "%s", tmpRecordPtr->patientFirstName);
+                fscanf(fp, "%s", tmpEntryInfo);
+                tmpRecordPtr->patientFirstName = malloc(sizeof(char) * (strlen(tmpEntryInfo) + 1));
+                strcpy(tmpRecordPtr->patientFirstName, tmpEntryInfo);
+
                 break;
             case 2:
-                fscanf(fp, "%s", tmpRecordPtr->patientLastName);
+                fscanf(fp, "%s", tmpEntryInfo);
+                tmpRecordPtr->patientLastName = malloc(sizeof(char) * (strlen(tmpEntryInfo) + 1));
+                strcpy(tmpRecordPtr->patientLastName, tmpEntryInfo);
+
                 break;
             case 3:
-                fscanf(fp, "%s", tmpRecordPtr->diseaseID);
+                fscanf(fp, "%s", tmpEntryInfo);
+                tmpRecordPtr->diseaseID = malloc(sizeof(char) * (strlen(tmpEntryInfo) + 1));
+                strcpy(tmpRecordPtr->diseaseID, tmpEntryInfo);
+
                 break;
             case 4:
-                fscanf(fp, "%s", tmpRecordPtr->country);
+                fscanf(fp, "%s", tmpEntryInfo);
+                tmpRecordPtr->country = malloc(sizeof(char) * (strlen(tmpEntryInfo) + 1));
+                strcpy(tmpRecordPtr->country, tmpEntryInfo);
+
                 break;
             case 5:
-                printf("ok\n");
                 fscanf(fp, "%s", tmpDateInfo);
                 sscanf(tmpDateInfo, "%d-%d-%d", &(tmpRecordPtr->entryDate.day), &(tmpRecordPtr->entryDate.month), &(tmpRecordPtr->entryDate.year));
-                printf("ok: %d\n", tmpRecordPtr->entryDate.day);
                 break;
             case 6: // last entry of a record
                 fscanf(fp, "%s", tmpDateInfo);
