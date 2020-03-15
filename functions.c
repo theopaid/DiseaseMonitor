@@ -7,7 +7,7 @@
 
 void printRecord(patientRecord record) {
 
-    printf("%s | %s | %s | %s | %s | %s | %s\n", record.recordID, record.patientFirstName, record.patientLastName, record.diseaseID, record.country, record.entryDate, record.exitDate);
+    printf("%s | %s | %s | %s | %s | %d-%d-%d | %d-%d-%d\n", record.recordID, record.patientFirstName, record.patientLastName, record.diseaseID, record.country, record.entryDate.day, record.entryDate.month, record.entryDate.year, record.exitDate.day, record.exitDate.month, record.exitDate.year);
 }
 
 void printList(listNode *head) {
@@ -77,6 +77,7 @@ void getArgs(int *diseaseHashTableNumOfEntries, int *countryHashTableNumOfEntrie
 listNode * storeData(char *patientRecordsFile) {
 
     listNode *head = NULL;
+    char *tmpDateInfo;
 
     FILE *fp = fopen(patientRecordsFile, "r");
 
@@ -111,10 +112,14 @@ listNode * storeData(char *patientRecordsFile) {
                 fscanf(fp, "%s", tmpRecordPtr->country);
                 break;
             case 5:
-                fscanf(fp, "%s", tmpRecordPtr->entryDate);
+                printf("ok\n");
+                fscanf(fp, "%s", tmpDateInfo);
+                sscanf(tmpDateInfo, "%d-%d-%d", &(tmpRecordPtr->entryDate.day), &(tmpRecordPtr->entryDate.month), &(tmpRecordPtr->entryDate.year));
+                printf("ok: %d\n", tmpRecordPtr->entryDate.day);
                 break;
             case 6: // last entry of a record
-                fscanf(fp, "%s", tmpRecordPtr->exitDate);
+                fscanf(fp, "%s", tmpDateInfo);
+                sscanf(tmpDateInfo, "%d-%d-%d", &(tmpRecordPtr->exitDate.day), &(tmpRecordPtr->exitDate.month), &(tmpRecordPtr->exitDate.year));
                 push(&head, &tmpRecordPtr);
                 break;
         }
