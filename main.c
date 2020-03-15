@@ -6,7 +6,7 @@ typedef int bool;
 #define true 1;
 #define false 0;
 
-struct patientRecord
+typedef struct patientRecord
 {
     char recordID[32];
     char patientFirstName[32];
@@ -15,7 +15,54 @@ struct patientRecord
     char country[32];
     char entryDate[11];
     char exitDate[11];
-};
+} patientRecord;
+
+void printRecord(patientRecord record) {
+
+    printf("%s | %s | %s | %s | %s | %s | %s\n", record.recordID, record.patientFirstName, record.patientLastName, record.diseaseID, record.country, record.entryDate, record.exitDate);
+}
+
+typedef struct listNode
+{
+    patientRecord record;
+    struct listNode *next;
+} listNode;
+
+void printList(listNode *head) {
+
+    listNode *current = head;
+    while (current != NULL) {
+        printRecord(current->record);
+        current = current->next;
+    }
+    
+}
+
+void push(listNode **head, patientRecord *record) {
+
+    if(*head == NULL) { // list empty
+        *head = (listNode *) malloc(sizeof(listNode));
+        if(*head == NULL) {
+            exit(-1);
+        }
+        (*head)->record = *record;
+        (*head)->next = NULL;
+        return;
+    }
+
+    listNode *current = *head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+
+    current->next = (listNode *) malloc(sizeof(listNode));
+    if(current->next == NULL) {
+        exit(-1);
+    }
+    current->next->record = *record;
+    current->next->next = NULL;    
+}
+
 
 bool validArgs(int argc,char *argv[]) {
 
@@ -45,9 +92,10 @@ void getArgs(int *diseaseHashTableNumOfEntries, int *countryHashTableNumOfEntrie
     }
 }
 
-void storeData(char *patientRecordsFile) {
+listNode * storeData(char *patientRecordsFile) {
 
-    char data[21][32];
+    listNode *head = NULL;
+
     FILE *fp = fopen(patientRecordsFile, "r");
 
     if(fp == NULL) {
@@ -55,40 +103,45 @@ void storeData(char *patientRecordsFile) {
         exit(-1);
     }
 
-    struct patientRecord *tmpRecordPtr;
+    patientRecord *tmpRecordPtr;
 
     for(int i = 0; !feof(fp); i++) {
-        fscanf(fp, "%s", data[i]);
 
         switch(i % 7)
         {
-            case 0: // start of record
-                tmpRecordPtr = malloc(sizeof(struct patientRecord));
-                strcpy(tmpRecordPtr->recordID, data[i]);
+            case 0: // start of a record
+                tmpRecordPtr = malloc(sizeof(patientRecord));
+                if(tmpRecordPtr == NULL) {
+                    exit(-1);
+                }
+                fscanf(fp, "%s", tmpRecordPtr->recordID);
                 break;
             case 1:
-                strcpy(tmpRecordPtr->patientFirstName, data[i]);
+                fscanf(fp, "%s", tmpRecordPtr->patientFirstName);
                 break;
             case 2:
-                strcpy(tmpRecordPtr->patientLastName, data[i]);
+                fscanf(fp, "%s", tmpRecordPtr->patientLastName);
                 break;
             case 3:
-                strcpy(tmpRecordPtr->diseaseID, data[i]);
+                fscanf(fp, "%s", tmpRecordPtr->diseaseID);
                 break;
             case 4:
-                strcpy(tmpRecordPtr->country, data[i]);
+                fscanf(fp, "%s", tmpRecordPtr->country);
                 break;
             case 5:
-                strcpy(tmpRecordPtr->entryDate, data[i]);
+                fscanf(fp, "%s", tmpRecordPtr->entryDate);
                 break;
-            case 6:
-                strcpy(tmpRecordPtr->exitDate, data[i]);
+            case 6: // last entry of a record
+                fscanf(fp, "%s", tmpRecordPtr->exitDate);
+                push(&head, tmpRecordPtr);
                 break;
         }
     }
 
 
     fclose(fp);
+
+    return head;
 }
 
 int main (int argc, char *argv[]) {
@@ -102,7 +155,8 @@ int main (int argc, char *argv[]) {
     char *patientRecordsFile;
     getArgs(&diseaseHashTableNumOfEntries, &countryHashTableNumOfEntries, &bucketSize, &patientRecordsFile, argv);
 
-    storeData(patientRecordsFile);
+    listNode *head = storeData(patientRecordsFile); // head of list with records
+    printList(head);
 
     return 0;
 }
