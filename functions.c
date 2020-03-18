@@ -159,6 +159,23 @@ void getArgs(int *diseaseHashTableNumOfEntries, int *countryHashTableNumOfEntrie
     }
 }
 
+bool isUniqueID(listNode *head, char *newID) {
+
+    listNode *current = head;
+
+    while(current->next != NULL && strcmp(current->record->recordID, newID)) {
+        current = current->next;
+    }
+
+    if(current->next == NULL) {
+        if(strcmp(current->record->recordID, newID)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 listNode * storeData(char *patientRecordsFile) {
 
     listNode *head = NULL;
@@ -184,12 +201,16 @@ listNode * storeData(char *patientRecordsFile) {
                     exit(-1);
                 }
 
-                //if(!isUniqueID) {
-                //    printf("Multiple instances of the same ID found! Operation shuts down.\n");
-                //    programExit();
-                //}
-
                 fscanf(fp, "%s", tmpEntryInfo);
+
+                if(head != NULL) {
+                    if(!isUniqueID(head, tmpEntryInfo)) {
+                        printf("Multiple instances of the same ID found! Operation shuts down.\n");
+                        //programExit();
+                        exit(-1);
+                    }
+                }
+
                 tmpRecordPtr->recordID = malloc(sizeof(char) * (strlen(tmpEntryInfo) + 1));
                 strcpy(tmpRecordPtr->recordID, tmpEntryInfo);
 

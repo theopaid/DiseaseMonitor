@@ -46,3 +46,5 @@ listNode * storeData(char *patientRecordsFile);
 void sortDateInsert(listNode **head,patientRecord **record);
 
 int compareDates(listNode *current, patientRecord *record);
+
+bool isUniqueID(listNode* head, char* newID);
