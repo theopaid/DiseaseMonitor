@@ -42,3 +42,7 @@ bool validArgs(int argc,char *argv[]);
 void getArgs(int *diseaseHashTableNumOfEntries, int *countryHashTableNumOfEntries, int *bucketSize, char **patientRecordsFile, char *argv[]);
 
 listNode * storeData(char *patientRecordsFile);
+
+void sortDateInsert(listNode **head,patientRecord **record);
+
+int compareDates(listNode *current, patientRecord *record);

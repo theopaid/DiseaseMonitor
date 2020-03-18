@@ -12,9 +12,7 @@ int main (int argc, char *argv[]) {
     getArgs(&diseaseHashTableNumOfEntries, &countryHashTableNumOfEntries, &bucketSize, &patientRecordsFile, argv);
 
     listNode *head = storeData(patientRecordsFile); // head of list with records
-    printList(head);
-
-    
+    printList(head);   
 
     return 0;
 }

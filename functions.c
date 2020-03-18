@@ -22,7 +22,7 @@ void printList(listNode *head) {
 
 void push(listNode **head, patientRecord **record) {
 
-    if(*head == NULL) { // list empty
+    if(*head == NULL) { // if list is empty
         *head = (listNode *) malloc(sizeof(listNode));
         if(*head == NULL) {
             exit(-1);
@@ -45,6 +45,91 @@ void push(listNode **head, patientRecord **record) {
     current->next->next = NULL;    
 }
 
+void sortDateInsert(listNode **head, patientRecord **record) {
+
+    int sortFlag;
+
+    if(*head == NULL) { // if list is empty
+        *head = (listNode *) malloc(sizeof(listNode));
+        if(*head == NULL) {
+            exit(-1);
+        }
+        (*head)->record = *record;
+        (*head)->next = NULL;
+        return;
+    }
+
+    listNode *current;
+    sortFlag = compareDates(*head, *record);
+
+    if(sortFlag == 0 || sortFlag == 1) { // if new record's date is older than head's (or same)
+        current = (listNode *) malloc(sizeof(listNode));
+        if(current == NULL) {
+            exit(-1);
+        }
+        current->record = *record;
+        current->next = *head;
+        *head = current;
+        return;
+    }
+
+    current = *head;
+    listNode *previous = NULL;
+    listNode *newNode = (listNode *) malloc(sizeof(listNode));
+        if(newNode == NULL) {
+            exit(-1);
+        }
+    newNode->record = *record;
+
+    while(current->next != NULL && compareDates(current, *record) == 2) {
+        previous = current;
+        current = current->next;
+    }
+
+    if(current->next == NULL) {
+        if(compareDates(current, *record) == 2) {
+            current->next = newNode;
+            newNode->next = NULL;
+        }
+        else {
+            newNode->next = current;
+            previous->next = newNode;
+        }
+    }
+    else {
+        newNode->next = current;
+        previous->next = newNode;
+    }
+
+}
+
+int compareDates(listNode *current, patientRecord *record) { // 0:for same dates
+                                                             // 1:if new Date is older than list node's one
+    int sameDates = 0;                                       // 2:if new Date is newer than listNode's one
+
+    if(record->entryDate.year < current->record->entryDate.year) {
+        return 1;
+    }
+    else if(record->entryDate.year > current->record->entryDate.year) {
+        return 2;
+    }
+
+    if(record->entryDate.month < current->record->entryDate.month) {
+        return 1;
+    }
+    else if(record->entryDate.month > current->record->entryDate.month) {
+        return 2;
+    }
+
+    if(record->entryDate.day < current->record->entryDate.day) {
+        return 1;
+    }
+    else if(record->entryDate.day > current->record->entryDate.day) {
+        return 2;
+    }
+
+    return sameDates;
+}
 
 bool validArgs(int argc,char *argv[]) {
 
@@ -99,6 +184,11 @@ listNode * storeData(char *patientRecordsFile) {
                     exit(-1);
                 }
 
+                //if(!isUniqueID) {
+                //    printf("Multiple instances of the same ID found! Operation shuts down.\n");
+                //    programExit();
+                //}
+
                 fscanf(fp, "%s", tmpEntryInfo);
                 tmpRecordPtr->recordID = malloc(sizeof(char) * (strlen(tmpEntryInfo) + 1));
                 strcpy(tmpRecordPtr->recordID, tmpEntryInfo);
@@ -135,7 +225,7 @@ listNode * storeData(char *patientRecordsFile) {
             case 6: // last entry of a record
                 fscanf(fp, "%s", tmpDateInfo);
                 sscanf(tmpDateInfo, "%d-%d-%d", &(tmpRecordPtr->exitDate.day), &(tmpRecordPtr->exitDate.month), &(tmpRecordPtr->exitDate.year));
-                push(&head, &tmpRecordPtr);
+                sortDateInsert(&head, &tmpRecordPtr);
                 break;
         }
     }
