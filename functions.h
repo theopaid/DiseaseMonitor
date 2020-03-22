@@ -13,7 +13,6 @@ typedef struct Date
     int year;
 } Date;
 
-
 typedef struct patientRecord
 {
     char *recordID;
@@ -30,6 +29,32 @@ typedef struct listNode
     patientRecord *record;
     struct listNode *next;
 } listNode;
+
+typedef struct bstNode
+{
+    listNode *record;
+    struct bstNode *left;
+    struct bstNode *right;
+    Date dateValue;
+} bstNode;
+
+typedef struct bucketPair
+{
+    char *key;
+    bstNode **root;
+} bucketPair;
+
+typedef struct bucket
+{
+    bucketPair *pairsInBucket;
+    int pairsCounter;
+    struct bucket *next;
+} bucket;
+
+
+bucket **hashTableInit(int tableSize);
+
+void hashTableInsert(bucket **hashTable, char *keyName, char* tableType, int tableSize, int bucketSize, listNode *record);
 
 void printRecord(patientRecord record);
 
@@ -48,3 +73,5 @@ void sortDateInsert(listNode **head,patientRecord **record);
 int compareDates(listNode *current, patientRecord *record);
 
 bool isUniqueID(listNode* head, char* newID);
+
+int hashFunction(char *deseaseID, int hashTableSize);

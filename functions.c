@@ -5,6 +5,87 @@
 #include "functions.h"
 
 
+bucket **hashTableInit(int tableSize) {
+
+    bucket **hashTable = malloc(tableSize * sizeof(bucket*));
+    int i;
+    for(i = 0; i < tableSize; i++) {
+        hashTable[i] = NULL;
+    }
+    return hashTable;
+}
+
+void hashTableInsert(bucket **hashTable, char *keyName, char* tableType, int tableSize, int bucketSize, listNode *record) {
+
+    int key = hashFunction(keyName, tableSize);
+    int remainingSize = bucketSize - sizeof(int) - sizeof(bucket*);
+    int canHoldPairs = remainingSize / (sizeof(char*) + sizeof(bstNode*));
+    int i;
+    printf("lets insert/ at/pairs: %s | %d | %d\n", keyName, key, canHoldPairs);
+
+    if(canHoldPairs < 1) {
+        printf("Can't hold any info, because the bucket size given is pretty small!\n");
+        exit(-1);
+    }
+
+    if(hashTable[key] == NULL) {
+        printf("entered_1\n");
+        // if this index is empty create new bucket and allocate memory for it
+        hashTable[key] = malloc(sizeof(bucket));
+        hashTable[key]->next = NULL;
+        hashTable[key]->pairsInBucket = malloc(canHoldPairs * sizeof(bucketPair));
+        //hashTable[key]->pairsInBucket[0].root = NULL;
+        hashTable[key]->pairsInBucket[0].key = malloc(sizeof(char)*(strlen(keyName) + 1));
+        strcpy(hashTable[key]->pairsInBucket[0].key, keyName);
+        hashTable[key]->pairsCounter = 1;
+        printf("inserted at: %d\n", key);
+    }
+    else {
+        printf("entered_mid\n");
+        bucket *tempBucket = hashTable[key];
+        while(1) {
+            printf("entered_mid2\n");
+            for(i = 0; i < tempBucket->pairsCounter; i++) {
+                if(strcmp(keyName, tempBucket->pairsInBucket[i].key) == 0) {
+                    printf("already stored in pos: %d\n", i);
+                    // this key is already stored in a bucket
+                    //bstInsert(hashTable[key]->pairsInBucket[0].root, record);
+                    return;
+                }
+            }
+            if(tempBucket->next == NULL) {
+                break;
+            }
+            tempBucket = tempBucket->next;
+        }
+        // first check if there is space in the last bucket
+        if(tempBucket->pairsCounter < canHoldPairs) {
+            printf("entered_2\n");
+            // there is free space
+            printf("ok1\n");
+            tempBucket->pairsInBucket[tempBucket->pairsCounter].key = malloc(sizeof(char)*(strlen(keyName) + 1));
+            strcpy(tempBucket->pairsInBucket[tempBucket->pairsCounter].key, keyName);
+            //bstInit(tempBucket->pairsInBucket[tempBucket->pairsCounter].root, record);
+            printf("ok2\n");
+            tempBucket->pairsCounter += 1;
+            printf("inserted_2 at: %d\n", key);
+            return;
+        }
+        // we need to create a new bucket
+        printf("entered_3\n");
+        tempBucket->next = malloc(sizeof(bucket));
+        tempBucket = tempBucket->next; // point to newly created bucket
+        tempBucket->next = NULL;
+        tempBucket->pairsInBucket = malloc(canHoldPairs * sizeof(bucketPair));
+        //tempBucket->pairsInBucket[0].root = NULL;
+        tempBucket->pairsInBucket[0].key  = malloc(sizeof(char)*(strlen(keyName) + 1));
+        strcpy(tempBucket->pairsInBucket[0].key, keyName);
+        tempBucket->pairsCounter = 1;
+        printf("inserted_3 at: %d\n", key);
+
+    }
+}
+
 void printRecord(patientRecord record) {
 
     printf("%s | %s | %s | %s | %s | %d-%d-%d | %d-%d-%d\n", record.recordID, record.patientFirstName, record.patientLastName, record.diseaseID, record.country, record.entryDate.day, record.entryDate.month, record.entryDate.year, record.exitDate.day, record.exitDate.month, record.exitDate.year);
@@ -17,7 +98,7 @@ void printList(listNode *head) {
         printRecord(*(current->record));
         current = current->next;
     }
-    
+
 }
 
 void push(listNode **head, patientRecord **record) {
@@ -42,7 +123,7 @@ void push(listNode **head, patientRecord **record) {
         exit(-1);
     }
     current->next->record = *record;
-    current->next->next = NULL;    
+    current->next->next = NULL;
 }
 
 void sortDateInsert(listNode **head, patientRecord **record) {
@@ -255,4 +336,16 @@ listNode * storeData(char *patientRecordsFile) {
     fclose(fp);
 
     return head;
+}
+
+int hashFunction(char *keyName, int hashTableSize) {
+
+    int hashVal = 0;
+    int len = strlen(keyName);
+
+    for(int i = 0; i < len; i++) {
+        hashVal += keyName[i];
+    }
+
+    return hashVal % hashTableSize;
 }

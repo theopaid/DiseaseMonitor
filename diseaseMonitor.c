@@ -12,7 +12,18 @@ int main (int argc, char *argv[]) {
     getArgs(&diseaseHashTableNumOfEntries, &countryHashTableNumOfEntries, &bucketSize, &patientRecordsFile, argv);
 
     listNode *head = storeData(patientRecordsFile); // head of list with records
-    printList(head);   
+    printList(head);
+    bucket **diseaseHashTable = hashTableInit(diseaseHashTableNumOfEntries);
+
+    listNode *current = head;
+    while (current != NULL) {
+        //printRecord(*(current->record));
+        hashTableInsert(diseaseHashTable, current->record->diseaseID, "disease", diseaseHashTableNumOfEntries, bucketSize, current);
+        current = current->next;
+    }
+
+    char* test = "Cdgjlkbnsdojnbg";
+    printf("hashResult: %d\n", hashFunction(test, diseaseHashTableNumOfEntries));
 
     return 0;
 }
