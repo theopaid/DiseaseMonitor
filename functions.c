@@ -34,9 +34,12 @@ void hashTableInsert(bucket **hashTable, char *keyName, char* tableType, int tab
         hashTable[key] = malloc(sizeof(bucket));
         hashTable[key]->next = NULL;
         hashTable[key]->pairsInBucket = malloc(canHoldPairs * sizeof(bucketPair));
-        //hashTable[key]->pairsInBucket[0].root = NULL;
+        hashTable[key]->pairsInBucket[0].root = NULL;
         hashTable[key]->pairsInBucket[0].key = malloc(sizeof(char)*(strlen(keyName) + 1));
         strcpy(hashTable[key]->pairsInBucket[0].key, keyName);
+        hashTable[key]->pairsInBucket[0].root = insert(hashTable[key]->pairsInBucket[0].root, record->record->entryDate, record);
+        printf("1: \n");
+        preOrder(hashTable[key]->pairsInBucket[0].root);
         hashTable[key]->pairsCounter = 1;
         printf("inserted at: %d\n", key);
     }
@@ -49,7 +52,9 @@ void hashTableInsert(bucket **hashTable, char *keyName, char* tableType, int tab
                 if(strcmp(keyName, tempBucket->pairsInBucket[i].key) == 0) {
                     printf("already stored in pos: %d\n", i);
                     // this key is already stored in a bucket
-                    //bstInsert(hashTable[key]->pairsInBucket[0].root, record);
+                    hashTable[key]->pairsInBucket[0].root = insert(hashTable[key]->pairsInBucket[0].root, record->record->entryDate, record);
+                    printf("2: \n");
+                    preOrder(hashTable[key]->pairsInBucket[0].root);
                     return;
                 }
             }
@@ -65,7 +70,9 @@ void hashTableInsert(bucket **hashTable, char *keyName, char* tableType, int tab
             printf("ok1\n");
             tempBucket->pairsInBucket[tempBucket->pairsCounter].key = malloc(sizeof(char)*(strlen(keyName) + 1));
             strcpy(tempBucket->pairsInBucket[tempBucket->pairsCounter].key, keyName);
-            //bstInit(tempBucket->pairsInBucket[tempBucket->pairsCounter].root, record);
+            tempBucket->pairsInBucket[tempBucket->pairsCounter].root = insert(tempBucket->pairsInBucket[tempBucket->pairsCounter].root, record->record->entryDate, record);
+            printf("3: \n");
+            preOrder(tempBucket->pairsInBucket[tempBucket->pairsCounter].root);
             printf("ok2\n");
             tempBucket->pairsCounter += 1;
             printf("inserted_2 at: %d\n", key);
@@ -77,10 +84,14 @@ void hashTableInsert(bucket **hashTable, char *keyName, char* tableType, int tab
         tempBucket = tempBucket->next; // point to newly created bucket
         tempBucket->next = NULL;
         tempBucket->pairsInBucket = malloc(canHoldPairs * sizeof(bucketPair));
-        //tempBucket->pairsInBucket[0].root = NULL;
+        tempBucket->pairsInBucket[0].root = NULL;
+
         tempBucket->pairsInBucket[0].key  = malloc(sizeof(char)*(strlen(keyName) + 1));
         strcpy(tempBucket->pairsInBucket[0].key, keyName);
         tempBucket->pairsCounter = 1;
+        tempBucket->pairsInBucket[0].root = insert(tempBucket->pairsInBucket[0].root, record->record->entryDate, record);
+        printf("4: \n");
+        preOrder(tempBucket->pairsInBucket[0].root);
         printf("inserted_3 at: %d\n", key);
 
     }
@@ -207,6 +218,34 @@ int compareDates(listNode *current, patientRecord *record) { // 0:for same dates
     }
     else if(record->entryDate.day > current->record->entryDate.day) {
         return 2;
+    }
+
+    return sameDates;
+}
+
+int compareStructDates(Date date1, Date date2) {             // -1: date1 < date2
+                                                             // 0: date1 = date2
+    int sameDates = 0;                                       // 1: date1 > date2
+
+    if(date1.year < date2.year) {
+        return -1;
+    }
+    else if(date1.year > date2.year) {
+        return 1;
+    }
+
+    if(date1.month < date2.month) {
+        return -1;
+    }
+    else if(date1.month > date2.month) {
+        return 1;
+    }
+
+    if(date1.day < date2.day) {
+        return -1;
+    }
+    else if(date1.day > date2.day) {
+        return 1;
     }
 
     return sameDates;
@@ -348,4 +387,118 @@ int hashFunction(char *keyName, int hashTableSize) {
     }
 
     return hashVal % hashTableSize;
+}
+
+bstNode *newNode(Date keydateValue, listNode *record) {
+
+    bstNode *node = (bstNode *)malloc(sizeof(bstNode));
+    node->record = record;
+    node->dateValue = keydateValue;
+    node->left = NULL;
+    node->right = NULL;
+    node->height = 1;
+    node->count = 1;
+    return (node);
+}
+
+bstNode *rightRotate(bstNode *y) {
+
+    bstNode *x = y->left;
+    bstNode *T2 = x->right;
+
+    x->right = y;
+    y->left = T2;
+
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
+
+    return x;
+}
+
+bstNode *leftRotate(bstNode *x) {
+
+    bstNode *y = x->right;
+    bstNode *T2 = y->left;
+
+    y->left = x;
+    x->right = T2;
+
+    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
+
+    return y;
+}
+
+int getBalance(bstNode *N) {
+
+    if (N == NULL)
+        return 0;
+    return height(N->left) - height(N->right);
+}
+
+bstNode *insert(bstNode *node, Date keydateValue, listNode *record) {
+
+    if (node == NULL) {
+        return (newNode(keydateValue, record));
+    }
+
+    Date nodesDate = node->dateValue;
+
+    if (nodesDate.year==keydateValue.year && nodesDate.month==keydateValue.month && nodesDate.day==keydateValue.day) {
+        (node->count)++;
+        return node;
+    }
+
+    if (compareStructDates(keydateValue, nodesDate) == -1) {
+        node->left = insert(node->left, keydateValue, record);
+    }
+    else {
+        node->right = insert(node->right, keydateValue, record);
+    }
+
+    node->height = max(height(node->left), height(node->right)) + 1;
+
+    int balance = getBalance(node);
+
+    if(balance > 1 && compareStructDates(keydateValue, node->left->dateValue) == -1) {
+        return rightRotate(node);
+    }
+
+    if(balance < -1 && compareStructDates(keydateValue, node->right->dateValue) == 1) {
+        return leftRotate(node);
+    }
+
+    if(balance > 1 && compareStructDates(keydateValue, node->left->dateValue) == 1) {
+        node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+
+    if(balance < -1 && compareStructDates(keydateValue, node->right->dateValue) == -1) {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+
+    return node;
+}
+
+int max(int a, int b) {
+
+    return (a > b) ? a : b;
+}
+
+int height(bstNode *N) {
+
+    if(N == NULL) {
+        return 0;
+    }
+    return N->height;
+}
+
+void preOrder(bstNode *root) {
+
+    if (root != NULL) {
+        printf("%d(%d) ", root->dateValue.day, root->count);
+        preOrder(root->left);
+        preOrder(root->right);
+    }
 }

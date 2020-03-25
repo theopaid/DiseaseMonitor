@@ -33,15 +33,17 @@ typedef struct listNode
 typedef struct bstNode
 {
     listNode *record;
+    Date dateValue;
     struct bstNode *left;
     struct bstNode *right;
-    Date dateValue;
+    int height;
+    int count;
 } bstNode;
 
 typedef struct bucketPair
 {
     char *key;
-    bstNode **root;
+    bstNode *root;
 } bucketPair;
 
 typedef struct bucket
@@ -51,6 +53,21 @@ typedef struct bucket
     struct bucket *next;
 } bucket;
 
+int max(int a, int b);
+
+int height(bstNode *N);
+
+bstNode *rightRotate(bstNode *y);
+
+bstNode *leftRotate(bstNode *x);
+
+bstNode *insert(bstNode *node, Date keydateValue, listNode *record);
+
+void preOrder(bstNode *root);
+
+int getBalance(bstNode *N);
+
+bstNode *newNode(Date dateValue, listNode *record);
 
 bucket **hashTableInit(int tableSize);
 

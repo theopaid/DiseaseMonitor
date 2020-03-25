@@ -21,9 +21,8 @@ int main (int argc, char *argv[]) {
         hashTableInsert(diseaseHashTable, current->record->diseaseID, "disease", diseaseHashTableNumOfEntries, bucketSize, current);
         current = current->next;
     }
-
-    char* test = "Cdgjlkbnsdojnbg";
-    printf("hashResult: %d\n", hashFunction(test, diseaseHashTableNumOfEntries));
+    printf("last: %d\n", diseaseHashTable[7]->pairsInBucket[0].root->count);
+    preOrder(diseaseHashTable[7]->pairsInBucket[0].root);
 
     return 0;
 }
