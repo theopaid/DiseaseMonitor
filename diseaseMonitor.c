@@ -23,12 +23,12 @@ int main (int argc, char *argv[]) {
         hashTableInsert(countryHashTable, current->record->country, "country", countryHashTableNumOfEntries, bucketSize, current);
         current = current->next;
     }
-    printf("last: %s\n", diseaseHashTable[2]->next->pairsInBucket[0].root->record->next->record->recordID);
-    preOrder(diseaseHashTable[7]->pairsInBucket[0].root);
+    //printf("last: %s\n", diseaseHashTable[2]->next->pairsInBucket[0].root->record->next->record->recordID);
+    //preOrder(diseaseHashTable[7]->pairsInBucket[0].root);
 
-    printf("last: %s\n", countryHashTable[3]->pairsInBucket[0].root->record->next->record->recordID);
+    //printf("last: %s\n", countryHashTable[3]->pairsInBucket[1].root->right->record->record->recordID);
 
-    //renderMenu();
+    renderMenu(diseaseHashTable, countryHashTable, head);
 
     return 0;
 }

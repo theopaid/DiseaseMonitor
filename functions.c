@@ -5,6 +5,138 @@
 #include "functions.h"
 
 
+void renderMenu(bucket **diseaseHashTable, bucket **countryHashTable, listNode *head) {
+
+    char line[LINE_MAX];
+    char *command = NULL, *userInput = NULL, *arguments = NULL;
+
+    printf("-------------------------------------------------------------------\n\n");
+    printf("\t\t----------- DISEASE MONITOR -----------\n\n");
+    printf("For instructions on how to use the app, type /man :\n");
+
+    while(fgets(line, LINE_MAX, stdin) != NULL) {
+        printf("ok\n");
+        userInput = line;
+        printf("ok\n");
+        command = strtok_r(userInput, " \n", &userInput); // Getting main command
+        printf("ok\n");
+        arguments = strtok(userInput, "\n"); // Getting all the arguments. NULL if there are none.
+        printf("ok\n");
+
+        if(command != NULL) {
+            if(strcmp(command, "/globalDiseaseStats") == 0) {
+                if(arguments != NULL && strlen(arguments) < 19) {
+                    printf("Time specific search needs both Entry and Exit dates!\n");
+                    continue;
+                }
+                else {
+                    globalDiseaseStats(arguments, diseaseHashTable);
+                }
+            }
+            else if(strcmp(command, "/topk-Diseases") == 0) {
+                if(arguments != NULL && (strlen(arguments) < 24 && strlen(arguments) > 12)) {
+                    printf("Time specific search needs both Entry and Exit dates!\n");
+                    continue;
+                }
+                else {
+                    //topDiseases(arguments, diseaseHashTable, head);
+                }
+            }
+            else if(strcmp(command, "/topk-Countries") == 0) {
+                if(arguments != NULL && (strlen(arguments) < 24 && strlen(arguments) > 15)) {
+                    printf("Time specific search needs both Entry and Exit dates!\n");
+                    continue;
+                }
+                else {
+                    //topCountries(arguments, countryHashTable, head);
+                }
+            }
+            else if(strcmp(command, "/recordPatientExit") == 0) {
+                if(arguments != NULL && strlen(arguments) < 10) {
+                    printf("Time specific search needs both Entry and Exit dates!\n");
+                    continue;
+                }
+                else {
+                    //recordPatientExit(arguments, head);
+                }
+            }
+            else if(strcmp(command, "/numCurrentPatients") == 0) {
+                //numCurrentPatients(arguments, diseaseHashTable);
+            }
+            else if(strcmp(command, "/diseaseFrequency") == 0) {
+                if(arguments != NULL && strlen(arguments) < 10) {
+                    printf("Data is not valid!\n");
+                    continue;
+                }
+                else {
+                    //diseaseFrequency(arguments, diseaseHashTable, head);
+                }
+            }
+            else if(strcmp(command, "/insertPatientRecord") == 0) {
+                if(arguments != NULL && strlen(arguments) < 30) {
+                    printf("Data is not valid!\n");
+                    continue;
+                }
+                else {
+                    //insertPatientRecord(arguments, diseaseHashTable, countryHashTable, head);
+                }
+            }
+            else if(strcmp(command, "/man") == 0) {
+                printManual();
+            }
+            else if(strcmp(command, "/exit") == 0) {
+                printf("\nExiting the application. Goodbye..\n");
+                //free(line);
+                return;
+            }
+            else {
+                printf("Command not found!\n");
+            }
+        }
+    }
+}
+
+void inputToDates(char *arguments, Date *entryDate, Date *exitDate) {
+
+    sscanf(arguments, "%d-%d-%d %d-%d-%d", &(entryDate->day), &(entryDate->month), &(entryDate->year), &(exitDate->day), &(exitDate->month), &(exitDate->year));
+}
+
+void globalDiseaseStats(char* arguments,bucket **diseaseHashTable) {
+
+    if(arguments != NULL) { // time specific search
+
+
+        Date entryDate, exitDate;
+        inputToDates(arguments, &entryDate, &exitDate);
+
+        if(compareStructDates(entryDate, exitDate) == 1) { // entryDate > exitDate
+            printf("Entry date must be earlier than Exit date!\n");
+            return;
+        }
+
+    }
+}
+
+void printManual() {
+
+    char word;
+    FILE *fp = fopen("manual.txt", "r");
+
+    printf("ok\n");
+    if(fp == NULL) {
+        printf("Could not open file manual.txt\n");
+        exit(-1);
+    }
+
+    while(!feof(fp)) {
+        //printf("ok\n");
+        fscanf(fp, "%c", &word);
+        printf("%c", word);
+    }
+    printf("\n\n");
+}
+
+
 bucket **hashTableInit(int tableSize) {
 
     bucket **hashTable = malloc(tableSize * sizeof(bucket*));
@@ -365,7 +497,14 @@ listNode * storeData(char *patientRecordsFile) {
                 break;
             case 6: // last entry of a record
                 fscanf(fp, "%s", tmpDateInfo);
-                sscanf(tmpDateInfo, "%d-%d-%d", &(tmpRecordPtr->exitDate.day), &(tmpRecordPtr->exitDate.month), &(tmpRecordPtr->exitDate.year));
+                if(atoi(tmpDateInfo) == 0) { // if patient is still sick
+                    tmpRecordPtr->exitDate.day = 0;
+                    tmpRecordPtr->exitDate.month = 0;
+                    tmpRecordPtr->exitDate.year = 0;
+                }
+                else {
+                    sscanf(tmpDateInfo, "%d-%d-%d", &(tmpRecordPtr->exitDate.day), &(tmpRecordPtr->exitDate.month), &(tmpRecordPtr->exitDate.year));
+                }
                 sortDateInsert(&head, &tmpRecordPtr);
                 break;
         }

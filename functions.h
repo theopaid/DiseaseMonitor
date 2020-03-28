@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define LINE_MAX 100
+
 typedef int bool;
 #define true 1;
 #define false 0;
@@ -53,6 +55,12 @@ typedef struct bucket
     struct bucket *next;
 } bucket;
 
+void renderMenu(bucket **diseaseHashTable, bucket **countryHashTable, listNode *head);
+
+void printManual();
+
+void globalDiseaseStats(char* arguments,bucket **diseaseHashTable);
+
 int max(int a, int b);
 
 int height(bstNode *N);
@@ -88,6 +96,8 @@ listNode * storeData(char *patientRecordsFile);
 void sortDateInsert(listNode **head,patientRecord **record);
 
 int compareDates(listNode *current, patientRecord *record);
+
+int compareStructDates(Date date1, Date date2);
 
 bool isUniqueID(listNode* head, char* newID);
 
