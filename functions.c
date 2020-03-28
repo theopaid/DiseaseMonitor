@@ -52,7 +52,7 @@ void hashTableInsert(bucket **hashTable, char *keyName, char* tableType, int tab
                 if(strcmp(keyName, tempBucket->pairsInBucket[i].key) == 0) {
                     printf("already stored in pos: %d\n", i);
                     // this key is already stored in a bucket
-                    hashTable[key]->pairsInBucket[0].root = insert(hashTable[key]->pairsInBucket[0].root, record->record->entryDate, record);
+                    hashTable[key]->pairsInBucket[i].root = insert(hashTable[key]->pairsInBucket[i].root, record->record->entryDate, record);
                     printf("2: \n");
                     preOrder(hashTable[key]->pairsInBucket[0].root);
                     return;
@@ -398,6 +398,7 @@ bstNode *newNode(Date keydateValue, listNode *record) {
     node->right = NULL;
     node->height = 1;
     node->count = 1;
+    printf("INSERTING NODE: KEYdate = %d | ID = %s\n", keydateValue.day, record->record->recordID);
     return (node);
 }
 
@@ -437,6 +438,8 @@ int getBalance(bstNode *N) {
 }
 
 bstNode *insert(bstNode *node, Date keydateValue, listNode *record) {
+
+    printf("STARTING INSERT FOR: %d | %s\n",keydateValue.year , record->record->recordID);
 
     if (node == NULL) {
         return (newNode(keydateValue, record));
