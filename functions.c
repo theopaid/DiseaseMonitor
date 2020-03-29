@@ -41,8 +41,12 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
                     printf("Data is not valid!\n");
                     continue;
                 }
+                else if(arguments == NULL) {
+                    printf("No arguments were given!\n");
+                }
                 else {
-                    diseaseFrequency(arguments, diseaseHashTable, head);
+                    printf("mpainei\n");
+                    diseaseFrequency(arguments, diseaseHTable, head);
                 }
             }
             else if(strcmp(command, "/topk-Diseases") == 0) {
@@ -51,7 +55,7 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
                     continue;
                 }
                 else {
-                    //topDiseases(arguments, diseaseHashTable, head);
+                    //topDiseases(arguments, diseaseHTable, head);
                 }
             }
             else if(strcmp(command, "/topk-Countries") == 0) {
@@ -60,7 +64,7 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
                     continue;
                 }
                 else {
-                    //topCountries(arguments, countryHashTable, head);
+                    //topCountries(arguments, countryHTable, head);
                 }
             }
             else if(strcmp(command, "/insertPatientRecord") == 0) {
@@ -69,7 +73,7 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
                     continue;
                 }
                 else {
-                    //insertPatientRecord(arguments, diseaseHashTable, countryHashTable, head);
+                    //insertPatientRecord(arguments, diseaseHTable, countryHTable, head);
                 }
             }
             else if(strcmp(command, "/recordPatientExit") == 0) {
@@ -82,7 +86,7 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
                 }
             }
             else if(strcmp(command, "/numCurrentPatients") == 0) {
-                //numCurrentPatients(arguments, diseaseHashTable);
+                //numCurrentPatients(arguments, diseaseHTable);
             }
             else if(strcmp(command, "/man") == 0) {
                 printManual();
@@ -102,6 +106,11 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
 void inputToDates(char *arguments, Date *entryDate, Date *exitDate) {
 
     sscanf(arguments, "%d-%d-%d %d-%d-%d", &(entryDate->day), &(entryDate->month), &(entryDate->year), &(exitDate->day), &(exitDate->month), &(exitDate->year));
+}
+
+void inputToDate(char *argument, Date *date) {
+
+    sscanf(argument, "%d-%d-%d", &(date->day), &(date->month), &(date->year));
 }
 
 void globalDiseaseStats(char* arguments,hashTable *diseaseHTable) {
@@ -154,9 +163,82 @@ void globalDiseaseStats(char* arguments,hashTable *diseaseHTable) {
     }
 }
 
-void diseaseFrequency(char *arguments,hashTable *diseaseHashTable,listNode *head) {
+void diseaseFrequency(char *arguments,hashTable *diseaseHTable,listNode *head) {
 
+    int htPos;
+    char *localArgs;
+    char *virusName, *country, *entryDateStr, *exitDateStr;
+    int count = 0;
+    bucket *currentBucket;
 
+    localArgs = strtok(arguments, " ");
+    while(localArgs != NULL) {
+        count++;
+        switch (count) {
+            case 1:
+                virusName = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(virusName, localArgs);
+                break;
+            case 2:
+                country = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(country, localArgs);
+                break;
+            case 3:
+                entryDateStr = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(entryDateStr, localArgs);
+                break;
+            case 4:
+                exitDateStr = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(exitDateStr, localArgs);
+                break;
+        }
+        localArgs = strtok(NULL, " ");
+    }
+    if(count == 3) { // if a country was not given as an argument
+        // replace the date values
+        exitDateStr = malloc(sizeof(char) * (strlen(entryDateStr) + 1));
+        strcpy(exitDateStr, entryDateStr);
+        strcpy(entryDateStr, country);
+        free(country);
+        country = NULL;
+    }
+
+    htPos = hashFunction(virusName, diseaseHTable->counter);
+
+    Date entryDate, exitDate;
+    inputToDate(entryDateStr, &entryDate);
+    inputToDate(exitDateStr, &exitDate);
+    if(compareStructDates(entryDate, exitDate) == 1) { // entryDate > exitDate
+        printf("Entry date must be earlier than Exit date!\n");
+        return;
+    }
+    if(country == NULL) {
+
+        currentBucket = diseaseHTable->bucketPtrs[htPos];
+        while(currentBucket != NULL) { // iterating all the buckets
+
+            for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
+
+                printf("Disease: %s  |  Patients: %d\n", virusName, preOrderDiseaseCounter(currentBucket->pairsInBucket[j].root, country, entryDate, exitDate));
+            }
+
+            currentBucket = currentBucket->next;
+        }
+
+    }
+    else {
+
+        currentBucket = diseaseHTable->bucketPtrs[htPos];
+        while(currentBucket != NULL) { // iterating all the buckets
+
+            for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
+
+                printf("Disease: %s  |  Patients:  %d|  Country: %s\n", virusName, preOrderDiseaseCounter(currentBucket->pairsInBucket[j].root, country, entryDate, exitDate), country);
+            }
+
+            currentBucket = currentBucket->next;
+        }
+    }
 }
 
 void printManual() {
@@ -717,9 +799,38 @@ int preOrderCounterWDates(bstNode *root, Date entryDate, Date exitDate) {
         if(compareStructDates(entryDate, root->dateValue) != 1 && compareStructDates(exitDate, root->dateValue) != -1) {
             // enter if entryDate <= treeNode date >= exitDate
             counter = root->count;
-            counter += preOrderCounter(root->left);
-            counter += preOrderCounter(root->right);
         }
+        counter += preOrderCounterWDates(root->left, entryDate, exitDate);
+        counter += preOrderCounterWDates(root->right, entryDate, exitDate);
+    }
+
+    return counter;
+}
+
+int preOrderDiseaseCounter(bstNode *root, char *country, Date entryDate, Date exitDate) {
+
+    listNode *currentNode;
+    int counter = 0;
+    if(root != NULL) {
+        if(compareStructDates(entryDate, root->dateValue) != 1 && compareStructDates(exitDate, root->dateValue) != -1) {
+            // enter if entryDate <= treeNode date >= exitDate
+            if(country != NULL) {
+                currentNode = root->record;
+                while(currentNode != NULL && compareStructDates(root->dateValue, currentNode->record->entryDate) == 0) {
+                    // As long as records have the same entryDate as root
+                    if(strcmp(currentNode->record->country, country) == 0) { // if country matches the one in the record
+                        counter++;
+                    }
+
+                    currentNode = currentNode->next;
+                }
+            }
+            else {
+                counter = root->count;
+            }
+        }
+        counter += preOrderDiseaseCounter(root->left, country, entryDate, exitDate);
+        counter += preOrderDiseaseCounter(root->right, country, entryDate, exitDate);
     }
 
     return counter;

@@ -65,7 +65,13 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
 
 void printManual();
 
+void inputToDates(char *arguments, Date *entryDate, Date *exitDate);
+
+void inputToDate(char *argument, Date *date);
+
 void globalDiseaseStats(char* arguments,hashTable *diseaseHTable);
+
+void diseaseFrequency(char *arguments,hashTable *diseaseHashTable,listNode *head);
 
 int max(int a, int b);
 
@@ -82,6 +88,8 @@ void preOrder(bstNode *root);
 int preOrderCounter(bstNode *root);
 
 int preOrderCounterWDates(bstNode *root, Date entryDate, Date exitDate);
+
+int preOrderDiseaseCounter(bstNode *root, char *country, Date entryDate, Date exitDate);
 
 int getBalance(bstNode *N);
 
