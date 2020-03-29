@@ -5,7 +5,7 @@
 #include "functions.h"
 
 
-void renderMenu(bucket **diseaseHashTable, bucket **countryHashTable, listNode *head) {
+void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *head) {
 
     char line[LINE_MAX];
     char *command = NULL, *userInput = NULL, *arguments = NULL;
@@ -14,14 +14,17 @@ void renderMenu(bucket **diseaseHashTable, bucket **countryHashTable, listNode *
     printf("\t\t----------- DISEASE MONITOR -----------\n\n");
     printf("For instructions on how to use the app, type /man :\n");
 
-    while(fgets(line, LINE_MAX, stdin) != NULL) {
-        printf("ok\n");
+    while(1) {
+
+        printf("%s> ", "DiseaseMonitor");
+
+        if(fgets(line, LINE_MAX, stdin) == NULL) {
+            break;
+        }
+
         userInput = line;
-        printf("ok\n");
-        command = strtok_r(userInput, " \n", &userInput); // Getting main command
-        printf("ok\n");
-        arguments = strtok(userInput, "\n"); // Getting all the arguments. NULL if there are none.
-        printf("ok\n");
+        command = strtok_r(userInput, " \n", &userInput); // Getting main
+        arguments = strtok(userInput, "\n"); // Getting all the arguments. NULL if there are none
 
         if(command != NULL) {
             if(strcmp(command, "/globalDiseaseStats") == 0) {
@@ -30,7 +33,16 @@ void renderMenu(bucket **diseaseHashTable, bucket **countryHashTable, listNode *
                     continue;
                 }
                 else {
-                    globalDiseaseStats(arguments, diseaseHashTable);
+                    globalDiseaseStats(arguments, diseaseHTable);
+                }
+            }
+            else if(strcmp(command, "/diseaseFrequency") == 0) {
+                if(arguments != NULL && strlen(arguments) < 10) {
+                    printf("Data is not valid!\n");
+                    continue;
+                }
+                else {
+                    //diseaseFrequency(arguments, diseaseHashTable, head);
                 }
             }
             else if(strcmp(command, "/topk-Diseases") == 0) {
@@ -51,6 +63,15 @@ void renderMenu(bucket **diseaseHashTable, bucket **countryHashTable, listNode *
                     //topCountries(arguments, countryHashTable, head);
                 }
             }
+            else if(strcmp(command, "/insertPatientRecord") == 0) {
+                if(arguments != NULL && strlen(arguments) < 30) {
+                    printf("Data is not valid!\n");
+                    continue;
+                }
+                else {
+                    //insertPatientRecord(arguments, diseaseHashTable, countryHashTable, head);
+                }
+            }
             else if(strcmp(command, "/recordPatientExit") == 0) {
                 if(arguments != NULL && strlen(arguments) < 10) {
                     printf("Time specific search needs both Entry and Exit dates!\n");
@@ -63,29 +84,11 @@ void renderMenu(bucket **diseaseHashTable, bucket **countryHashTable, listNode *
             else if(strcmp(command, "/numCurrentPatients") == 0) {
                 //numCurrentPatients(arguments, diseaseHashTable);
             }
-            else if(strcmp(command, "/diseaseFrequency") == 0) {
-                if(arguments != NULL && strlen(arguments) < 10) {
-                    printf("Data is not valid!\n");
-                    continue;
-                }
-                else {
-                    //diseaseFrequency(arguments, diseaseHashTable, head);
-                }
-            }
-            else if(strcmp(command, "/insertPatientRecord") == 0) {
-                if(arguments != NULL && strlen(arguments) < 30) {
-                    printf("Data is not valid!\n");
-                    continue;
-                }
-                else {
-                    //insertPatientRecord(arguments, diseaseHashTable, countryHashTable, head);
-                }
-            }
             else if(strcmp(command, "/man") == 0) {
                 printManual();
             }
             else if(strcmp(command, "/exit") == 0) {
-                printf("\nExiting the application. Goodbye..\n");
+                printf("\nExiting the application. Goodbye and stay safe..\n");
                 //free(line);
                 return;
             }
@@ -101,7 +104,9 @@ void inputToDates(char *arguments, Date *entryDate, Date *exitDate) {
     sscanf(arguments, "%d-%d-%d %d-%d-%d", &(entryDate->day), &(entryDate->month), &(entryDate->year), &(exitDate->day), &(exitDate->month), &(exitDate->year));
 }
 
-void globalDiseaseStats(char* arguments,bucket **diseaseHashTable) {
+void globalDiseaseStats(char* arguments,hashTable *diseaseHTable) {
+
+    int htSize = diseaseHTable->counter;
 
     if(arguments != NULL) { // time specific search
 
@@ -113,7 +118,39 @@ void globalDiseaseStats(char* arguments,bucket **diseaseHashTable) {
             printf("Entry date must be earlier than Exit date!\n");
             return;
         }
+        for(int i=0; i < htSize; i++) {
+            if(diseaseHTable->bucketPtrs[i] != NULL) { // if there is data in this hashNode
 
+                bucket *currentBucket = diseaseHTable->bucketPtrs[i];
+                while(currentBucket != NULL) { // iterating all the buckets
+
+                    for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
+
+                        printf("Disease: %s  |  Patients: %d\n", currentBucket->pairsInBucket[j].key, preOrderCounterWDates(currentBucket->pairsInBucket[j].root, entryDate, exitDate));
+                    }
+
+                    currentBucket = currentBucket->next;
+                }
+            }
+        }
+    }
+    else {
+
+        for(int i=0; i < htSize; i++) {
+            if(diseaseHTable->bucketPtrs[i] != NULL) { // if there is data in this hashNode
+
+                bucket *currentBucket = diseaseHTable->bucketPtrs[i];
+                while(currentBucket != NULL) { // iterating all the buckets
+
+                    for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
+
+                        printf("Disease: %s  |  Patients: %d\n", currentBucket->pairsInBucket[j].key, preOrderCounter(currentBucket->pairsInBucket[j].root));
+                    }
+
+                    currentBucket = currentBucket->next;
+                }
+            }
+        }
     }
 }
 
@@ -505,6 +542,10 @@ listNode * storeData(char *patientRecordsFile) {
                 else {
                     sscanf(tmpDateInfo, "%d-%d-%d", &(tmpRecordPtr->exitDate.day), &(tmpRecordPtr->exitDate.month), &(tmpRecordPtr->exitDate.year));
                 }
+                if(compareStructDates(tmpRecordPtr->entryDate, tmpRecordPtr->exitDate) == 1  && tmpRecordPtr->exitDate.day != 0) {
+                    printf("EntryDate at recordID = %s is newer than ExitDate! Exiting..\n", tmpRecordPtr->recordID);
+                    exit(-1);
+                }
                 sortDateInsert(&head, &tmpRecordPtr);
                 break;
         }
@@ -581,11 +622,12 @@ bstNode *insert(bstNode *node, Date keydateValue, listNode *record) {
     printf("STARTING INSERT FOR: %d | %s\n",keydateValue.year , record->record->recordID);
 
     if (node == NULL) {
+        printf("NULL:OK\n");
         return (newNode(keydateValue, record));
     }
-
+    printf("INSERT:OK1\n");
     Date nodesDate = node->dateValue;
-
+    printf("INSERT:OK2\n");
     if (nodesDate.year==keydateValue.year && nodesDate.month==keydateValue.month && nodesDate.day==keydateValue.day) {
         (node->count)++;
         return node;
@@ -638,9 +680,36 @@ int height(bstNode *N) {
 
 void preOrder(bstNode *root) {
 
-    if (root != NULL) {
+    if(root != NULL) {
         printf("%d(%d) ", root->dateValue.day, root->count);
         preOrder(root->left);
         preOrder(root->right);
     }
+}
+
+int preOrderCounter(bstNode *root) {
+
+    int counter = 0;
+    if(root != NULL) {
+        counter = root->count;
+        counter += preOrderCounter(root->left);
+        counter += preOrderCounter(root->right);
+    }
+
+    return counter;
+}
+
+int preOrderCounterWDates(bstNode *root, Date entryDate, Date exitDate) {
+
+    int counter = 0;
+    if(root != NULL) {
+        if(compareStructDates(entryDate, root->dateValue) != 1 && compareStructDates(exitDate, root->dateValue) != -1) {
+            // enter if entryDate <= treeNode date >= exitDate
+            counter = root->count;
+            counter += preOrderCounter(root->left);
+            counter += preOrderCounter(root->right);
+        }
+    }
+
+    return counter;
 }

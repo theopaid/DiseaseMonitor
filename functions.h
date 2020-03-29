@@ -55,11 +55,17 @@ typedef struct bucket
     struct bucket *next;
 } bucket;
 
-void renderMenu(bucket **diseaseHashTable, bucket **countryHashTable, listNode *head);
+typedef struct hashTable
+{
+    bucket **bucketPtrs;
+    int counter;
+} hashTable;
+
+void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *head);
 
 void printManual();
 
-void globalDiseaseStats(char* arguments,bucket **diseaseHashTable);
+void globalDiseaseStats(char* arguments,hashTable *diseaseHTable);
 
 int max(int a, int b);
 
@@ -72,6 +78,10 @@ bstNode *leftRotate(bstNode *x);
 bstNode *insert(bstNode *node, Date keydateValue, listNode *record);
 
 void preOrder(bstNode *root);
+
+int preOrderCounter(bstNode *root);
+
+int preOrderCounterWDates(bstNode *root, Date entryDate, Date exitDate);
 
 int getBalance(bstNode *N);
 
