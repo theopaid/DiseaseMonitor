@@ -16,7 +16,7 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
 
     while(1) {
 
-        printf("%s> ", "DiseaseMonitor");
+        printf("\n%s> ", "DiseaseMonitor");
 
         if(fgets(line, LINE_MAX, stdin) == NULL) {
             break;
@@ -42,7 +42,7 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
                     continue;
                 }
                 else {
-                    //diseaseFrequency(arguments, diseaseHashTable, head);
+                    diseaseFrequency(arguments, diseaseHashTable, head);
                 }
             }
             else if(strcmp(command, "/topk-Diseases") == 0) {
@@ -110,7 +110,6 @@ void globalDiseaseStats(char* arguments,hashTable *diseaseHTable) {
 
     if(arguments != NULL) { // time specific search
 
-
         Date entryDate, exitDate;
         inputToDates(arguments, &entryDate, &exitDate);
 
@@ -136,14 +135,15 @@ void globalDiseaseStats(char* arguments,hashTable *diseaseHTable) {
     }
     else {
 
+        printf("htsize: %d\n", htSize);
         for(int i=0; i < htSize; i++) {
             if(diseaseHTable->bucketPtrs[i] != NULL) { // if there is data in this hashNode
-
+                printf("entered ht at: %d\n", i);
                 bucket *currentBucket = diseaseHTable->bucketPtrs[i];
                 while(currentBucket != NULL) { // iterating all the buckets
 
                     for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
-
+                        printf("in bucket[%d][%d]\n", i, j);
                         printf("Disease: %s  |  Patients: %d\n", currentBucket->pairsInBucket[j].key, preOrderCounter(currentBucket->pairsInBucket[j].root));
                     }
 
@@ -152,6 +152,11 @@ void globalDiseaseStats(char* arguments,hashTable *diseaseHTable) {
             }
         }
     }
+}
+
+void diseaseFrequency(char *arguments,hashTable *diseaseHashTable,listNode *head) {
+
+
 }
 
 void printManual() {
@@ -237,8 +242,10 @@ void hashTableInsert(bucket **hashTable, char *keyName, char* tableType, int tab
             printf("entered_2\n");
             // there is free space
             printf("ok1\n");
+            tempBucket->pairsInBucket[tempBucket->pairsCounter].root = NULL;
             tempBucket->pairsInBucket[tempBucket->pairsCounter].key = malloc(sizeof(char)*(strlen(keyName) + 1));
             strcpy(tempBucket->pairsInBucket[tempBucket->pairsCounter].key, keyName);
+            printf("key: %s\n", tempBucket->pairsInBucket[tempBucket->pairsCounter].key);
             tempBucket->pairsInBucket[tempBucket->pairsCounter].root = insert(tempBucket->pairsInBucket[tempBucket->pairsCounter].root, record->record->entryDate, record);
             printf("3: \n");
             preOrder(tempBucket->pairsInBucket[tempBucket->pairsCounter].root);
@@ -626,14 +633,16 @@ bstNode *insert(bstNode *node, Date keydateValue, listNode *record) {
         return (newNode(keydateValue, record));
     }
     printf("INSERT:OK1\n");
-    Date nodesDate = node->dateValue;
+    Date *nodesDate = &(node->dateValue);
     printf("INSERT:OK2\n");
-    if (nodesDate.year==keydateValue.year && nodesDate.month==keydateValue.month && nodesDate.day==keydateValue.day) {
+    printf("insertdates: %d-%d-%d\n", nodesDate->day, nodesDate->month, nodesDate->year);
+    if (nodesDate->year==keydateValue.year && nodesDate->month==keydateValue.month && nodesDate->day==keydateValue.day) {
         (node->count)++;
+        printf("INSERT:OK3\n");
         return node;
     }
 
-    if (compareStructDates(keydateValue, nodesDate) == -1) {
+    if (compareStructDates(keydateValue, *nodesDate) == -1) {
         node->left = insert(node->left, keydateValue, record);
     }
     else {
@@ -691,6 +700,8 @@ int preOrderCounter(bstNode *root) {
 
     int counter = 0;
     if(root != NULL) {
+        printf("%d-%d-%d and %d\n", root->dateValue.day, root->dateValue.month, root->dateValue.year, root->count);
+        printf("id: %s\n", root->record->record->recordID);
         counter = root->count;
         counter += preOrderCounter(root->left);
         counter += preOrderCounter(root->right);
