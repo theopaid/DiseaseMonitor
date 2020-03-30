@@ -144,15 +144,12 @@ void globalDiseaseStats(char* arguments,hashTable *diseaseHTable) {
     }
     else {
 
-        printf("htsize: %d\n", htSize);
         for(int i=0; i < htSize; i++) {
             if(diseaseHTable->bucketPtrs[i] != NULL) { // if there is data in this hashNode
-                printf("entered ht at: %d\n", i);
                 bucket *currentBucket = diseaseHTable->bucketPtrs[i];
                 while(currentBucket != NULL) { // iterating all the buckets
 
                     for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
-                        printf("in bucket[%d][%d]\n", i, j);
                         printf("Disease: %s  |  Patients: %d\n", currentBucket->pairsInBucket[j].key, preOrderCounter(currentBucket->pairsInBucket[j].root));
                     }
 
@@ -411,9 +408,27 @@ void numCurrentPatients(char *arguments, hashTable *diseaseHTable) {
 
             currentBucket = currentBucket->next;
         }
+
         printf("There is no Disease named that way!\n");
         return;
+    }
+    else {
 
+        int htSize = diseaseHTable->counter;
+
+        for(int i=0; i < htSize; i++) {
+            if(diseaseHTable->bucketPtrs[i] != NULL) { // if there is data in this hashNode
+                currentBucket = diseaseHTable->bucketPtrs[i];
+                while(currentBucket != NULL) { // iterating all the buckets
+
+                    for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
+                        prerOrderPrinterWDates(currentBucket->pairsInBucket[j].root);
+                    }
+
+                    currentBucket = currentBucket->next;
+                }
+            }
+        }
     }
 
 
@@ -1038,7 +1053,20 @@ int preOrderDiseaseCounterWDates(bstNode *root) {
 
 void prerOrderPrinterWDates(bstNode *root) {
 
+    //printf("mpike\n");
+    listNode *currentNode;
+    if(root != NULL) {
+        currentNode = root->record;
+        while(currentNode != NULL && compareStructDates(root->dateValue, currentNode->record->entryDate) == 0) {
+            // As long as records have the same entryDate as root
+            if(currentNode->record->exitDate.day == 0) { // if there is no Exit date
+                printRecord(*(currentNode->record));
+            }
 
-    prerOrderPrinterWDates(root->left);
-    prerOrderPrinterWDates(root->left);
+            currentNode = currentNode->next;
+        }
+
+        prerOrderPrinterWDates(root->left);
+        prerOrderPrinterWDates(root->right);
+    }
 }
