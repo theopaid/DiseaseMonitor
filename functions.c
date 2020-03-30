@@ -46,7 +46,7 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
                 }
                 else {
                     printf("mpainei\n");
-                    diseaseFrequency(arguments, diseaseHTable, head);
+                    diseaseFrequency(arguments, diseaseHTable);
                 }
             }
             else if(strcmp(command, "/topk-Diseases") == 0) {
@@ -73,7 +73,7 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
                     continue;
                 }
                 else {
-                    //insertPatientRecord(arguments, diseaseHTable, countryHTable, head);
+                    insertPatientRecord(arguments, diseaseHTable, countryHTable, head);
                 }
             }
             else if(strcmp(command, "/recordPatientExit") == 0) {
@@ -163,7 +163,7 @@ void globalDiseaseStats(char* arguments,hashTable *diseaseHTable) {
     }
 }
 
-void diseaseFrequency(char *arguments,hashTable *diseaseHTable,listNode *head) {
+void diseaseFrequency(char *arguments,hashTable *diseaseHTable) {
 
     int htPos;
     char *localArgs;
@@ -245,6 +245,75 @@ void diseaseFrequency(char *arguments,hashTable *diseaseHTable,listNode *head) {
     }
 }
 
+void insertPatientRecord(char *arguments,hashTable *diseaseHTable,hashTable *countryHTable,listNode *head) {
+
+    char *localArgs;
+    char *virusName, *country, *entryDateStr, *exitDateStr, *recordID, *firstName, *lastName;
+    int count = 0;
+    bucket *currentBucket;
+    patientRecord *tmpRecordPtr;
+    tmpRecordPtr = malloc(sizeof(patientRecord));
+    if(tmpRecordPtr == NULL) {
+        exit(-1);
+    }
+
+    localArgs = strtok(arguments, " ");
+    while(localArgs != NULL) {
+        count++;
+        switch (count) {
+            case 1:
+                tmpRecordPtr->recordID = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(tmpRecordPtr->recordID, localArgs);
+                break;
+            case 2:
+                tmpRecordPtr->patientFirstName = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(tmpRecordPtr->patientFirstName, localArgs);
+                break;
+            case 3:
+                tmpRecordPtr->patientLastName = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(tmpRecordPtr->patientLastName, localArgs);
+                break;
+            case 4:
+                tmpRecordPtr->diseaseID = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(tmpRecordPtr->diseaseID, localArgs);
+                break;
+            case 5:
+                tmpRecordPtr->country = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(tmpRecordPtr->country, localArgs);
+                break;
+            case 6:
+                entryDateStr = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(entryDateStr, localArgs);
+                break;
+            case 7:
+                exitDateStr = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(exitDateStr, localArgs);
+                break;
+        }
+        localArgs = strtok(NULL, " ");
+    }
+
+    //Date entryDate, exitDate;
+    if(count == 6) { // we need to set exitDate to 0-0-0;
+        tmpRecordPtr->exitDate.day = 0;
+        tmpRecordPtr->exitDate.month = 0;
+        tmpRecordPtr->exitDate.year = 0;
+        inputToDate(entryDateStr, &(tmpRecordPtr->entryDate));
+    }
+    else {
+        inputToDate(entryDateStr, &(tmpRecordPtr->entryDate));
+        inputToDate(exitDateStr, &(tmpRecordPtr->exitDate));
+        if(compareStructDates(tmpRecordPtr->entryDate, tmpRecordPtr->exitDate) == 1) { // entryDate > exitDate
+            printf("Entry date must be earlier than Exit date!\n");
+            return;
+        }
+    }
+
+    sortDateInsert(&head, &tmpRecordPtr);
+
+    printf("Record added\n");
+}
+
 void printManual() {
 
     char word;
@@ -275,10 +344,10 @@ bucket **hashTableInit(int tableSize) {
     return hashTable;
 }
 
-void hashTableInsert(bucket **hashTable, char *keyName, char* tableType, int tableSize, int bucketSize, listNode *record) {
+void hashTableInsert(bucket **hashTable, char *keyName, listNode *record) {
 
-    int key = hashFunction(keyName, tableSize);
-    int remainingSize = bucketSize - sizeof(int) - sizeof(bucket*);
+    int key = hashFunction(keyName, hashTable->counter);
+    int remainingSize = hashTable->bucketSize - sizeof(int) - sizeof(bucket*);
     int canHoldPairs = remainingSize / (sizeof(char*) + sizeof(bstNode*));
     int i;
     printf("lets insert/ at/pairs: %s | %d | %d\n", keyName, key, canHoldPairs);

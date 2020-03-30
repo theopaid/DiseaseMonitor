@@ -59,6 +59,7 @@ typedef struct hashTable
 {
     bucket **bucketPtrs;
     int counter;
+    int bucketSize;
 } hashTable;
 
 void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *head);
@@ -69,9 +70,11 @@ void inputToDates(char *arguments, Date *entryDate, Date *exitDate);
 
 void inputToDate(char *argument, Date *date);
 
-void globalDiseaseStats(char* arguments,hashTable *diseaseHTable);
+void globalDiseaseStats(char* arguments, hashTable *diseaseHTable);
 
-void diseaseFrequency(char *arguments,hashTable *diseaseHashTable,listNode *head);
+void diseaseFrequency(char *arguments, hashTable *diseaseHashTable);
+
+void insertPatientRecord(char *arguments, hashTable *diseaseHTable, hashTable *countryHTable, listNode *head);
 
 int max(int a, int b);
 
@@ -97,7 +100,7 @@ bstNode *newNode(Date dateValue, listNode *record);
 
 bucket **hashTableInit(int tableSize);
 
-void hashTableInsert(bucket **hashTable, char *keyName, char* tableType, int tableSize, int bucketSize, listNode *record);
+void hashTableInsert(hashTable *hTable, char *keyName, listNode *record);
 
 void printRecord(patientRecord record);
 

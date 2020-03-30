@@ -18,17 +18,19 @@ int main (int argc, char *argv[]) {
     bucket **diseaseHashTable = hashTableInit(diseaseHashTableNumOfEntries);
     diseaseHTable.bucketPtrs = diseaseHashTable;
     diseaseHTable.counter = diseaseHashTableNumOfEntries;
+    diseaseHTable.bucketSize = bucketSize;
 
     hashTable countryHTable;
     bucket **countryHashTable = hashTableInit(countryHashTableNumOfEntries);
     countryHTable.bucketPtrs = countryHashTable;
     countryHTable.counter = countryHashTableNumOfEntries;
+    countryHTable.bucketSize = bucketSize;
 
     listNode *current = head;
     while (current != NULL) {
         //printRecord(*(current->record));
-        hashTableInsert(diseaseHashTable, current->record->diseaseID, "disease", diseaseHashTableNumOfEntries, bucketSize, current);
-        hashTableInsert(countryHashTable, current->record->country, "country", countryHashTableNumOfEntries, bucketSize, current);
+        hashTableInsert(&diseaseHTable, current->record->diseaseID, current);
+        hashTableInsert(&countryHTable, current->record->country, current);
         current = current->next;
     }
     //printf("last: %s\n", diseaseHashTable[2]->next->pairsInBucket[0].root->record->next->record->recordID);
