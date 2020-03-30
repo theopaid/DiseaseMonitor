@@ -1,4 +1,4 @@
-#include "functions.h"
+#include "../include/Interface.h"
 
 int main (int argc, char *argv[]) {
 
