@@ -180,26 +180,30 @@ void diseaseFrequency(char *arguments,hashTable *diseaseHTable,listNode *head) {
                 strcpy(virusName, localArgs);
                 break;
             case 2:
-                country = malloc(sizeof(char) * (strlen(localArgs) + 1));
-                strcpy(country, localArgs);
-                break;
-            case 3:
                 entryDateStr = malloc(sizeof(char) * (strlen(localArgs) + 1));
                 strcpy(entryDateStr, localArgs);
                 break;
-            case 4:
+            case 3:
                 exitDateStr = malloc(sizeof(char) * (strlen(localArgs) + 1));
                 strcpy(exitDateStr, localArgs);
+                break;
+            case 4:
+                country = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(country, localArgs);
                 break;
         }
         localArgs = strtok(NULL, " ");
     }
-    if(count == 3) { // if a country was not given as an argument
-        // replace the date values
-        exitDateStr = malloc(sizeof(char) * (strlen(entryDateStr) + 1));
-        strcpy(exitDateStr, entryDateStr);
-        strcpy(entryDateStr, country);
-        free(country);
+    // if(count == 3) { // if a country was not given as an argument
+    //     // replace the date values
+    //     exitDateStr = malloc(sizeof(char) * (strlen(entryDateStr) + 1));
+    //     strcpy(exitDateStr, entryDateStr);
+    //     strcpy(entryDateStr, country);
+    //     free(country);
+    //     country = NULL;
+    // }
+
+    if(count == 3) { // we need to set country to NULL;
         country = NULL;
     }
 

@@ -1,17 +1,19 @@
-The available commands are listed above:
+Below are the commands you can use:
 
-/**** Arguments in [..] can be ommited ***/
+-> Arguments in [..] are not necessary. <-
 
-• /globalDiseaseStats(/gl) [date1 date2] :  Print for every disease the total infections between [date1, date2] . If no date specified the command prints total diseases for every disease in all dates
+• /globalDiseaseStats [date1 date2] :  Print for every disease the total infections between [date1, date2] . If no date specified the command prints total diseases for every disease in all dates
 
-• /topk-Diseases(/tkd) k country  [date1 date2] :  Print, for a given country, top k diseases in range [date1, date2].
+• /diseaseFrequency virusName date1 date2 [country]  : Printf total infections of a [country] in range [date1, date2]
 
-• /topk-Countries(/tkc) k disease [date1 date2] : Print, for a given diseases, countries that top l infections have apperead.
+• /topk-Diseases k country  [date1 date2] :  Print, for a given country, top k diseases in range [date1, date2].
 
-• /recordPatientExit(/rpe) recordID exitDate : Insert an exit Date to the patient with the given id.
+• /topk-Countries k disease [date1 date2] : Print, for a given diseases, countries that top l infections have apperead.
 
-• /numCurrentPatients(/ncp) [disease] :  Print for a given disease the total patients that are still in the hospital.
+• /insertPatientRecord recordID patientFirstName patientLastName diseaseID country entryDate [exitDate]--> Insert a new Record in the System with the given attributes.
 
-• /diseaseFrequency(/df) virusName date1 date2 [country]  : Printf total infections of a [country] in range [date1, date2]
+• /recordPatientExit recordID exitDate : Insert an exit Date to the patient with the given id.
 
-• /insertPatientRecord(/ipr) recordID patientFirstName patientLastName diseaseID country entryDate [exitDate]--> Insert a new Record in the System with the given attributes.
+• /numCurrentPatients [disease] :  Print for a given disease the total patients that are still in the hospital.
+
+• /exit : Free the memory allocated and exit the application.
