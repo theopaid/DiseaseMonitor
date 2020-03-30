@@ -309,7 +309,9 @@ void insertPatientRecord(char *arguments,hashTable *diseaseHTable,hashTable *cou
         }
     }
 
-    sortDateInsert(&head, &tmpRecordPtr);
+    listNode *insertedNode = sortDateInsert(&head, &tmpRecordPtr);
+    hashTableInsert(diseaseHTable, insertedNode->record->diseaseID, insertedNode);
+    hashTableInsert(countryHTable, insertedNode->record->country, insertedNode);
 
     printf("Record added\n");
 }
@@ -344,7 +346,7 @@ bucket **hashTableInit(int tableSize) {
     return hashTable;
 }
 
-void hashTableInsert(bucket **hashTable, char *keyName, listNode *record) {
+void hashTableInsert(hashTable *hashTable, char *keyName, listNode *record) {
 
     int key = hashFunction(keyName, hashTable->counter);
     int remainingSize = hashTable->bucketSize - sizeof(int) - sizeof(bucket*);
@@ -357,33 +359,33 @@ void hashTableInsert(bucket **hashTable, char *keyName, listNode *record) {
         exit(-1);
     }
 
-    if(hashTable[key] == NULL) {
+    if(hashTable->bucketPtrs[key] == NULL) {
         printf("entered_1\n");
         // if this index is empty create new bucket and allocate memory for it
-        hashTable[key] = malloc(sizeof(bucket));
-        hashTable[key]->next = NULL;
-        hashTable[key]->pairsInBucket = malloc(canHoldPairs * sizeof(bucketPair));
-        hashTable[key]->pairsInBucket[0].root = NULL;
-        hashTable[key]->pairsInBucket[0].key = malloc(sizeof(char)*(strlen(keyName) + 1));
-        strcpy(hashTable[key]->pairsInBucket[0].key, keyName);
-        hashTable[key]->pairsInBucket[0].root = insert(hashTable[key]->pairsInBucket[0].root, record->record->entryDate, record);
+        hashTable->bucketPtrs[key] = malloc(sizeof(bucket));
+        hashTable->bucketPtrs[key]->next = NULL;
+        hashTable->bucketPtrs[key]->pairsInBucket = malloc(canHoldPairs * sizeof(bucketPair));
+        hashTable->bucketPtrs[key]->pairsInBucket[0].root = NULL;
+        hashTable->bucketPtrs[key]->pairsInBucket[0].key = malloc(sizeof(char)*(strlen(keyName) + 1));
+        strcpy(hashTable->bucketPtrs[key]->pairsInBucket[0].key, keyName);
+        hashTable->bucketPtrs[key]->pairsInBucket[0].root = insert(hashTable->bucketPtrs[key]->pairsInBucket[0].root, record->record->entryDate, record);
         printf("1: \n");
-        preOrder(hashTable[key]->pairsInBucket[0].root);
-        hashTable[key]->pairsCounter = 1;
+        preOrder(hashTable->bucketPtrs[key]->pairsInBucket[0].root);
+        hashTable->bucketPtrs[key]->pairsCounter = 1;
         printf("inserted at: %d\n", key);
     }
     else {
         printf("entered_mid\n");
-        bucket *tempBucket = hashTable[key];
+        bucket *tempBucket = hashTable->bucketPtrs[key];
         while(1) {
             printf("entered_mid2\n");
             for(i = 0; i < tempBucket->pairsCounter; i++) {
                 if(strcmp(keyName, tempBucket->pairsInBucket[i].key) == 0) {
                     printf("already stored in pos: %d\n", i);
                     // this key is already stored in a bucket
-                    hashTable[key]->pairsInBucket[i].root = insert(hashTable[key]->pairsInBucket[i].root, record->record->entryDate, record);
+                    hashTable->bucketPtrs[key]->pairsInBucket[i].root = insert(hashTable->bucketPtrs[key]->pairsInBucket[i].root, record->record->entryDate, record);
                     printf("2: \n");
-                    preOrder(hashTable[key]->pairsInBucket[0].root);
+                    preOrder(hashTable->bucketPtrs[key]->pairsInBucket[0].root);
                     return;
                 }
             }
@@ -468,7 +470,7 @@ void push(listNode **head, patientRecord **record) {
     current->next->next = NULL;
 }
 
-void sortDateInsert(listNode **head, patientRecord **record) {
+listNode *sortDateInsert(listNode **head, patientRecord **record) {
 
     int sortFlag;
 
@@ -479,7 +481,7 @@ void sortDateInsert(listNode **head, patientRecord **record) {
         }
         (*head)->record = *record;
         (*head)->next = NULL;
-        return;
+        return *head;
     }
 
     listNode *current;
@@ -493,7 +495,7 @@ void sortDateInsert(listNode **head, patientRecord **record) {
         current->record = *record;
         current->next = *head;
         *head = current;
-        return;
+        return *head;
     }
 
     current = *head;
@@ -523,7 +525,7 @@ void sortDateInsert(listNode **head, patientRecord **record) {
         newNode->next = current;
         previous->next = newNode;
     }
-
+    return newNode;
 }
 
 int compareDates(listNode *current, patientRecord *record) { // 0:for same dates

@@ -114,7 +114,7 @@ void getArgs(int *diseaseHashTableNumOfEntries, int *countryHashTableNumOfEntrie
 
 listNode * storeData(char *patientRecordsFile);
 
-void sortDateInsert(listNode **head,patientRecord **record);
+listNode *sortDateInsert(listNode **head,patientRecord **record);
 
 int compareDates(listNode *current, patientRecord *record);
 
