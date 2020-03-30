@@ -76,6 +76,10 @@ void diseaseFrequency(char *arguments, hashTable *diseaseHashTable);
 
 void insertPatientRecord(char *arguments, hashTable *diseaseHTable, hashTable *countryHTable, listNode *head);
 
+void recordPatientExit(char *arguments,listNode *head);
+
+void numCurrentPatients(char *arguments, hashTable *diseaseHTable);
+
 int max(int a, int b);
 
 int height(bstNode *N);
@@ -92,7 +96,11 @@ int preOrderCounter(bstNode *root);
 
 int preOrderCounterWDates(bstNode *root, Date entryDate, Date exitDate);
 
-int preOrderDiseaseCounter(bstNode *root, char *country, Date entryDate, Date exitDate);
+int preOrderDiseaseCountryCounter(bstNode *root, char *country, Date entryDate, Date exitDate);
+
+int preOrderDiseaseCounterWDates(bstNode *root);
+
+void prerOrderPrinterWDates(bstNode *root);
 
 int getBalance(bstNode *N);
 

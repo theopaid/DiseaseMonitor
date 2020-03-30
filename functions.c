@@ -78,15 +78,15 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
             }
             else if(strcmp(command, "/recordPatientExit") == 0) {
                 if(arguments != NULL && strlen(arguments) < 10) {
-                    printf("Time specific search needs both Entry and Exit dates!\n");
+                    printf("Enter a valid Exit date!\n");
                     continue;
                 }
                 else {
-                    //recordPatientExit(arguments, head);
+                    recordPatientExit(arguments, head);
                 }
             }
             else if(strcmp(command, "/numCurrentPatients") == 0) {
-                //numCurrentPatients(arguments, diseaseHTable);
+                numCurrentPatients(arguments, diseaseHTable);
             }
             else if(strcmp(command, "/man") == 0) {
                 printManual();
@@ -216,18 +216,23 @@ void diseaseFrequency(char *arguments,hashTable *diseaseHTable) {
         printf("Entry date must be earlier than Exit date!\n");
         return;
     }
+
     if(country == NULL) {
 
         currentBucket = diseaseHTable->bucketPtrs[htPos];
         while(currentBucket != NULL) { // iterating all the buckets
 
             for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
-
-                printf("Disease: %s  |  Patients: %d\n", virusName, preOrderDiseaseCounter(currentBucket->pairsInBucket[j].root, country, entryDate, exitDate));
+                if(strcmp(currentBucket->pairsInBucket[j].key, virusName) == 0) {
+                    printf("Disease: %s  |  Patients: %d\n", virusName, preOrderDiseaseCountryCounter(currentBucket->pairsInBucket[j].root, country, entryDate, exitDate));
+                    return;
+                }
             }
 
             currentBucket = currentBucket->next;
         }
+        printf("There is no Disease named that way!\n");
+        return;
 
     }
     else {
@@ -236,12 +241,16 @@ void diseaseFrequency(char *arguments,hashTable *diseaseHTable) {
         while(currentBucket != NULL) { // iterating all the buckets
 
             for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
-
-                printf("Disease: %s  |  Patients:  %d|  Country: %s\n", virusName, preOrderDiseaseCounter(currentBucket->pairsInBucket[j].root, country, entryDate, exitDate), country);
+                if(strcmp(currentBucket->pairsInBucket[j].key, virusName) == 0) {
+                    printf("Disease: %s  |  Patients:  %d|  Country: %s\n", virusName, preOrderDiseaseCountryCounter(currentBucket->pairsInBucket[j].root, country, entryDate, exitDate), country);
+                    return;
+                }
             }
 
             currentBucket = currentBucket->next;
         }
+        printf("There is no Disease named that way!\n");
+        return;
     }
 }
 
@@ -314,6 +323,100 @@ void insertPatientRecord(char *arguments,hashTable *diseaseHTable,hashTable *cou
     hashTableInsert(countryHTable, insertedNode->record->country, insertedNode);
 
     printf("Record added\n");
+}
+
+void recordPatientExit(char *arguments,listNode *head) {
+
+    char *localArgs;
+    char *recordID, *exitDateStr;
+    int count = 0;
+
+    localArgs = strtok(arguments, " ");
+    while(localArgs != NULL) {
+        count++;
+        switch (count) {
+            case 1:
+                recordID = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(recordID, localArgs);
+                break;
+            case 2:
+                exitDateStr = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(exitDateStr, localArgs);
+                break;
+        }
+        localArgs = strtok(NULL, " ");
+    }
+
+    Date exitDate;
+    inputToDate(exitDateStr, &exitDate);
+
+    listNode *current = head;
+    while(current != NULL) {
+        if(strcmp(current->record->recordID, recordID) == 0) { // if a record with the same ID is found
+            if(compareStructDates(current->record->entryDate, exitDate) == 1) {
+                printf("The Exit date should be newer than the Entry!\n");
+                return;
+            }
+            else {
+                current->record->exitDate.day = exitDate.day;
+                current->record->exitDate.month = exitDate.month;
+                current->record->exitDate.year = exitDate.year;
+                printf("exiting\n");
+                return;
+            }
+        }
+
+        current = current->next;
+    }
+    printf("No records found with the recordID given!\n");
+}
+
+void numCurrentPatients(char *arguments, hashTable *diseaseHTable) {
+
+    char *localArgs;
+    char *virusName;
+    int count = 0, htPos = 0;
+    bucket *currentBucket;
+
+    localArgs = strtok(arguments, " ");
+    while(localArgs != NULL) {
+        count++;
+        switch (count) {
+            case 1:
+                virusName = malloc(sizeof(char) * (strlen(localArgs) + 1));
+                strcpy(virusName, localArgs);
+                break;
+        }
+        localArgs = strtok(NULL, " ");
+    }
+
+    if(count == 0) { // we need to set virusName to NULL;
+        virusName = NULL;
+    }
+    else {
+        htPos = hashFunction(virusName, diseaseHTable->counter);
+    }
+
+    if(virusName != NULL) {
+
+        currentBucket = diseaseHTable->bucketPtrs[htPos];
+        while(currentBucket != NULL) { // iterating all the buckets
+
+            for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
+                if(strcmp(currentBucket->pairsInBucket[j].key, virusName) == 0) {
+                    printf("Disease: %s  |  Patients: %d\n", virusName, preOrderDiseaseCounterWDates(currentBucket->pairsInBucket[j].root));
+                    return;
+                }
+            }
+
+            currentBucket = currentBucket->next;
+        }
+        printf("There is no Disease named that way!\n");
+        return;
+
+    }
+
+
 }
 
 void printManual() {
@@ -882,7 +985,7 @@ int preOrderCounterWDates(bstNode *root, Date entryDate, Date exitDate) {
     return counter;
 }
 
-int preOrderDiseaseCounter(bstNode *root, char *country, Date entryDate, Date exitDate) {
+int preOrderDiseaseCountryCounter(bstNode *root, char *country, Date entryDate, Date exitDate) {
 
     listNode *currentNode;
     int counter = 0;
@@ -904,9 +1007,38 @@ int preOrderDiseaseCounter(bstNode *root, char *country, Date entryDate, Date ex
                 counter = root->count;
             }
         }
-        counter += preOrderDiseaseCounter(root->left, country, entryDate, exitDate);
-        counter += preOrderDiseaseCounter(root->right, country, entryDate, exitDate);
+        counter += preOrderDiseaseCountryCounter(root->left, country, entryDate, exitDate);
+        counter += preOrderDiseaseCountryCounter(root->right, country, entryDate, exitDate);
     }
 
     return counter;
+}
+
+int preOrderDiseaseCounterWDates(bstNode *root) {
+
+    listNode *currentNode;
+    int counter = 0;
+    if(root != NULL) {
+        currentNode = root->record;
+        while(currentNode != NULL && compareStructDates(root->dateValue, currentNode->record->entryDate) == 0) {
+            // As long as records have the same entryDate as root
+            if(currentNode->record->exitDate.day == 0) { // if there is no Exit date
+                counter++;
+            }
+
+            currentNode = currentNode->next;
+        }
+
+        counter += preOrderDiseaseCounterWDates(root->left);
+        counter += preOrderDiseaseCounterWDates(root->right);
+    }
+
+    return counter;
+}
+
+void prerOrderPrinterWDates(bstNode *root) {
+
+
+    prerOrderPrinterWDates(root->left);
+    prerOrderPrinterWDates(root->left);
 }
