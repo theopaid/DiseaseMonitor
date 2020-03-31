@@ -44,7 +44,6 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
                     printf("No arguments were given!\n");
                 }
                 else {
-                    printf("mpainei\n");
                     diseaseFrequency(arguments, diseaseHTable);
                 }
             }
@@ -92,7 +91,6 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
             }
             else if(strcmp(command, "/exit") == 0) {
                 printf("\nExiting the application. Goodbye and stay safe..\n");
-                //free(line);
                 return;
             }
             else {
@@ -228,6 +226,9 @@ void insertPatientRecord(char *arguments,hashTable *diseaseHTable,hashTable *cou
     patientRecord *tmpRecordPtr;
     tmpRecordPtr = malloc(sizeof(patientRecord));
     if(tmpRecordPtr == NULL) {
+        freeList(head);
+        freeHTable(diseaseHTable);
+        freeHTable(countryHTable);
         exit(-1);
     }
 
@@ -412,14 +413,12 @@ void printManual() {
     char word;
     FILE *fp = fopen("bin/manual.txt", "r");
 
-    printf("ok\n");
     if(fp == NULL) {
         printf("Could not open file manual.txt\n");
         exit(-1);
     }
 
     while(!feof(fp)) {
-        //printf("ok\n");
         fscanf(fp, "%c", &word);
         printf("%c", word);
     }

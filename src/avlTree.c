@@ -13,7 +13,6 @@ bstNode *newNode(Date keydateValue, listNode *record) {
     node->right = NULL;
     node->height = 1;
     node->count = 1;
-    printf("INSERTING NODE: KEYdate = %d | ID = %s\n", keydateValue.day, record->record->recordID);
     return (node);
 }
 
@@ -54,19 +53,13 @@ int getBalance(bstNode *N) {
 
 bstNode *insert(bstNode *node, Date keydateValue, listNode *record) {
 
-    printf("STARTING INSERT FOR: %d | %s\n",keydateValue.year , record->record->recordID);
 
     if (node == NULL) {
-        printf("NULL:OK\n");
         return (newNode(keydateValue, record));
     }
-    printf("INSERT:OK1\n");
     Date *nodesDate = &(node->dateValue);
-    printf("INSERT:OK2\n");
-    printf("insertdates: %d-%d-%d\n", nodesDate->day, nodesDate->month, nodesDate->year);
     if (nodesDate->year==keydateValue.year && nodesDate->month==keydateValue.month && nodesDate->day==keydateValue.day) {
         (node->count)++;
-        printf("INSERT:OK3\n");
         return node;
     }
 
@@ -118,7 +111,6 @@ int height(bstNode *N) {
 void preOrder(bstNode *root) {
 
     if(root != NULL) {
-        printf("%d(%d) ", root->dateValue.day, root->count);
         preOrder(root->left);
         preOrder(root->right);
     }
@@ -128,8 +120,6 @@ int preOrderCounter(bstNode *root) {
 
     int counter = 0;
     if(root != NULL) {
-        printf("%d-%d-%d and %d\n", root->dateValue.day, root->dateValue.month, root->dateValue.year, root->count);
-        printf("id: %s\n", root->record->record->recordID);
         counter = root->count;
         counter += preOrderCounter(root->left);
         counter += preOrderCounter(root->right);
@@ -206,7 +196,6 @@ int preOrderDiseaseCounterWDates(bstNode *root) {
 
 void prerOrderPrinterWDates(bstNode *root) {
 
-    //printf("mpike\n");
     listNode *currentNode;
     if(root != NULL) {
         currentNode = root->record;

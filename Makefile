@@ -1,4 +1,4 @@
-objects = src/main.o src/helpfulFunctions.o src/menuFunctions.o src/recordList.o src/hashTable.o src/avlTree.o
+objects = src/main.o src/helpfulFunctions.o src/menuFunctions.o src/recordList.o src/hashTable.o src/avlTree.o src/freeFunct.o
 
 diseaseMonitor : $(objects)
 		cc -o bin/diseaseMonitor $(objects)
@@ -13,6 +13,7 @@ src/menuFunctions.o : include/Interface.h
 src/recordList.o : include/Interface.h
 src/hashTable.o : include/Interface.h
 src/avlTree.o : include/Interface.h
+src/freeFunct.o : include/Interface.h
 
 .PHONY: clean
 clean :

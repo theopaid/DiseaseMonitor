@@ -131,3 +131,11 @@ int compareStructDates(Date date1, Date date2);
 bool isUniqueID(listNode* head, char* newID);
 
 int hashFunction(char *deseaseID, int hashTableSize);
+
+void freeList(listNode *head);
+
+void freeAVL(bstNode *root);
+
+void freeBuckets(bucket *firstBucket);
+
+void freeHTable(hashTable *hashTable);
