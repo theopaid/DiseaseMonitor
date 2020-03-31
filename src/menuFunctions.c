@@ -123,7 +123,7 @@ void globalDiseaseStats(char* arguments,hashTable *diseaseHTable) {
 
                     for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
 
-                        printf("Disease: %s  |  Patients: %d\n", currentBucket->pairsInBucket[j].key, preOrderCounterWDates(currentBucket->pairsInBucket[j].root, entryDate, exitDate));
+                        printf("%s %d\n", currentBucket->pairsInBucket[j].key, preOrderCounterWDates(currentBucket->pairsInBucket[j].root, entryDate, exitDate));
                     }
 
                     currentBucket = currentBucket->next;
@@ -139,7 +139,7 @@ void globalDiseaseStats(char* arguments,hashTable *diseaseHTable) {
                 while(currentBucket != NULL) { // iterating all the buckets
 
                     for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
-                        printf("Disease: %s  |  Patients: %d\n", currentBucket->pairsInBucket[j].key, preOrderCounter(currentBucket->pairsInBucket[j].root));
+                        printf("%s %d\n", currentBucket->pairsInBucket[j].key, preOrderCounter(currentBucket->pairsInBucket[j].root));
                     }
 
                     currentBucket = currentBucket->next;
@@ -203,41 +203,20 @@ void diseaseFrequency(char *arguments,hashTable *diseaseHTable) {
         return;
     }
 
-    if(country == NULL) {
+    currentBucket = diseaseHTable->bucketPtrs[htPos];
+    while(currentBucket != NULL) { // iterating all the buckets
 
-        currentBucket = diseaseHTable->bucketPtrs[htPos];
-        while(currentBucket != NULL) { // iterating all the buckets
-
-            for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
-                if(strcmp(currentBucket->pairsInBucket[j].key, virusName) == 0) {
-                    printf("Disease: %s  |  Patients: %d\n", virusName, preOrderDiseaseCountryCounter(currentBucket->pairsInBucket[j].root, country, entryDate, exitDate));
-                    return;
-                }
+        for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
+            if(strcmp(currentBucket->pairsInBucket[j].key, virusName) == 0) {
+                printf("%s %d\n", virusName, preOrderDiseaseCountryCounter(currentBucket->pairsInBucket[j].root, country, entryDate, exitDate));
+                return;
             }
-
-            currentBucket = currentBucket->next;
         }
-        printf("There is no Disease named that way!\n");
-        return;
 
+        currentBucket = currentBucket->next;
     }
-    else {
-
-        currentBucket = diseaseHTable->bucketPtrs[htPos];
-        while(currentBucket != NULL) { // iterating all the buckets
-
-            for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
-                if(strcmp(currentBucket->pairsInBucket[j].key, virusName) == 0) {
-                    printf("Disease: %s  |  Patients:  %d|  Country: %s\n", virusName, preOrderDiseaseCountryCounter(currentBucket->pairsInBucket[j].root, country, entryDate, exitDate), country);
-                    return;
-                }
-            }
-
-            currentBucket = currentBucket->next;
-        }
-        printf("There is no Disease named that way!\n");
-        return;
-    }
+    printf("There is no Disease named that way!\n");
+    return;
 }
 
 void insertPatientRecord(char *arguments,hashTable *diseaseHTable,hashTable *countryHTable,listNode *head) {
@@ -302,6 +281,11 @@ void insertPatientRecord(char *arguments,hashTable *diseaseHTable,hashTable *cou
             printf("Entry date must be earlier than Exit date!\n");
             return;
         }
+    }
+
+    if(!isUniqueID(head, tmpRecordPtr->recordID)) {
+        printf("Multiple instances of the same ID found! Operation shuts down.\n");
+        return;
     }
 
     listNode *insertedNode = sortDateInsert(&head, &tmpRecordPtr);
@@ -390,7 +374,7 @@ void numCurrentPatients(char *arguments, hashTable *diseaseHTable) {
 
             for(int j=0; j < currentBucket->pairsCounter; j++) { // accessing all keys of a bucket
                 if(strcmp(currentBucket->pairsInBucket[j].key, virusName) == 0) {
-                    printf("Disease: %s  |  Patients: %d\n", virusName, preOrderDiseaseCounterWDates(currentBucket->pairsInBucket[j].root));
+                    printf("%s %d\n", virusName, preOrderDiseaseCounterWDates(currentBucket->pairsInBucket[j].root));
                     return;
                 }
             }

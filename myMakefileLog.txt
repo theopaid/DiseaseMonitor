@@ -1,0 +1,2 @@
+cc -o bin/diseaseMonitor src/main.o src/helpfulFunctions.o src/menuFunctions.o src/recordList.o src/hashTable.o src/avlTree.o
+Try running ./bin/diseaseMonitor -b 70 -h1 10 -h2 10 -p bin/small.txt
