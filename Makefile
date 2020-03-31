@@ -1,10 +1,10 @@
 objects = src/main.o src/helpfulFunctions.o src/menuFunctions.o src/recordList.o src/hashTable.o src/avlTree.o src/freeFunct.o
 
 diseaseMonitor : $(objects)
-		cc -o bin/diseaseMonitor $(objects)
+		cc -o diseaseMonitor $(objects)
 		@echo "========================================================================"
-		@echo "|Try running: ./bin/diseaseMonitor -b 70 -h1 10 -h2 10 -p bin/small.txt|"
-		@echo "|Validation: ./bin/validator.sh bin/small.txt 10 10 70                 |"
+		@echo "|Try running: ./diseaseMonitor -b 70 -h1 10 -h2 10 -p bin/small.txt    |"
+		@echo "|Validation: ./validator.sh bin/small.txt 10 10 70                     |"
 		@echo "========================================================================"
 
 src/main.o : include/Interface.h
@@ -18,4 +18,4 @@ src/freeFunct.o : include/Interface.h
 .PHONY: clean
 clean :
 		@echo "Cleaning ...";
-		rm bin/diseaseMonitor $(objects)
+		rm diseaseMonitor $(objects)
