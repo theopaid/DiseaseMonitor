@@ -422,5 +422,4 @@ void printManual() {
         fscanf(fp, "%c", &word);
         printf("%c", word);
     }
-    printf("\n\n");
 }

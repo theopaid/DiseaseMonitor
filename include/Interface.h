@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define LINE_MAX 100
+#define LINE_MAX 1000
 
 typedef int bool;
 #define true 1;

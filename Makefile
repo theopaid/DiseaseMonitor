@@ -17,5 +17,5 @@ src/freeFunct.o : include/Interface.h
 
 .PHONY: clean
 clean :
-		@echo "Cleaning ...";
+		@echo "Cleaning ..."
 		rm diseaseMonitor $(objects)
