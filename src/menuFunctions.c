@@ -4,7 +4,8 @@
 
 #include "../include/Interface.h"
 
-void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *head) {
+void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *head, uniqueNamesList *headOfUniqueCountries, uniqueNamesList *headOfUniqueDiseases)
+{
 
     char line[LINE_MAX];
     char *command = NULL, *userInput = NULL, *arguments = NULL;
@@ -71,7 +72,7 @@ void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *he
                     continue;
                 }
                 else {
-                    insertPatientRecord(arguments, diseaseHTable, countryHTable, head);
+                    insertPatientRecord(arguments, diseaseHTable, countryHTable, head, headOfUniqueCountries, headOfUniqueDiseases);
                 }
             }
             else if(strcmp(command, "/recordPatientExit") == 0) {
@@ -217,7 +218,8 @@ void diseaseFrequency(char *arguments,hashTable *diseaseHTable) {
     return;
 }
 
-void insertPatientRecord(char *arguments,hashTable *diseaseHTable,hashTable *countryHTable,listNode *head) {
+void insertPatientRecord(char *arguments, hashTable *diseaseHTable, hashTable *countryHTable, listNode *head, uniqueNamesList *headOfUniqueCountries, uniqueNamesList *headOfUniqueDiseases)
+{
 
     char *localArgs;
     char *virusName, *country, *entryDateStr, *exitDateStr, *recordID, *firstName, *lastName;
@@ -290,8 +292,12 @@ void insertPatientRecord(char *arguments,hashTable *diseaseHTable,hashTable *cou
     }
 
     listNode *insertedNode = sortDateInsert(&head, &tmpRecordPtr);
+    insertUnique(&headOfUniqueCountries, tmpRecordPtr->country);
+    insertUnique(&headOfUniqueDiseases, tmpRecordPtr->diseaseID);
     hashTableInsert(diseaseHTable, insertedNode->record->diseaseID, insertedNode);
     hashTableInsert(countryHTable, insertedNode->record->country, insertedNode);
+    printUniqueList(headOfUniqueCountries);
+    printUniqueList(headOfUniqueDiseases);
 
     printf("Record added\n");
 }

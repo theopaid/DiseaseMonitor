@@ -69,7 +69,7 @@ typedef struct hashTable
     int bucketSize;
 } hashTable;
 
-void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *head);
+void renderMenu(hashTable *diseaseHTable, hashTable *countryHTable, listNode *head, uniqueNamesList *headOfUniqueCountries, uniqueNamesList *headOfUniqueDiseases);
 
 void printManual();
 
@@ -81,7 +81,7 @@ void globalDiseaseStats(char* arguments, hashTable *diseaseHTable);
 
 void diseaseFrequency(char *arguments, hashTable *diseaseHashTable);
 
-void insertPatientRecord(char *arguments, hashTable *diseaseHTable, hashTable *countryHTable, listNode *head);
+void insertPatientRecord(char *arguments, hashTable *diseaseHTable, hashTable *countryHTable, listNode *head, uniqueNamesList *headOfUniqueCountries, uniqueNamesList *headOfUniqueDiseases);
 
 void recordPatientExit(char *arguments,listNode *head);
 

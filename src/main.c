@@ -40,7 +40,7 @@ int main (int argc, char *argv[]) {
         current = current->next;
     }
 
-    renderMenu(&diseaseHTable, &countryHTable, head);
+    renderMenu(&diseaseHTable, &countryHTable, head, headOfUniqueCountries, headOfUniqueDiseases);
 
     freeList(head);
     freeHTable(&diseaseHTable);
