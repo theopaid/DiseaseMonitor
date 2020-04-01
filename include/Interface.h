@@ -32,6 +32,13 @@ typedef struct listNode
     struct listNode *next;
 } listNode;
 
+typedef struct uniqueNamesList
+{
+    char *nameId;
+    int counter;
+    struct uniqueNamesList *next;
+} uniqueNamesList;
+
 typedef struct bstNode
 {
     listNode *record;
@@ -120,7 +127,7 @@ bool validArgs(int argc,char *argv[]);
 
 void getArgs(int *diseaseHashTableNumOfEntries, int *countryHashTableNumOfEntries, int *bucketSize, char **patientRecordsFile, char *argv[]);
 
-listNode * storeData(char *patientRecordsFile);
+listNode * storeData(char *patientRecordsFile, uniqueNamesList **headOfUniqueCountries, uniqueNamesList **headOfUniqueDiseases);
 
 listNode *sortDateInsert(listNode **head,patientRecord **record);
 
@@ -139,3 +146,7 @@ void freeAVL(bstNode *root);
 void freeBuckets(bucket *firstBucket);
 
 void freeHTable(hashTable *hashTable);
+
+void printUniqueList(uniqueNamesList *head);
+
+void insertUnique(uniqueNamesList **head, char *name);

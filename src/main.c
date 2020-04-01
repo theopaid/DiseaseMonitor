@@ -11,7 +11,13 @@ int main (int argc, char *argv[]) {
     char *patientRecordsFile;
     getArgs(&diseaseHashTableNumOfEntries, &countryHashTableNumOfEntries, &bucketSize, &patientRecordsFile, argv);
 
-    listNode *head = storeData(patientRecordsFile); // head of list with records
+    uniqueNamesList *headOfUniqueCountries = NULL;
+    uniqueNamesList *headOfUniqueDiseases = NULL;
+
+    listNode *head = storeData(patientRecordsFile, &headOfUniqueCountries, &headOfUniqueDiseases); // head of list with records
+    printf("alloc ok\n");
+    printUniqueList(headOfUniqueCountries);
+    printUniqueList(headOfUniqueDiseases);
     //printList(head);
 
     // lest create the hash tables

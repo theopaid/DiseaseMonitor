@@ -97,7 +97,7 @@ listNode *sortDateInsert(listNode **head, patientRecord **record) {
     return newNode;
 }
 
-listNode * storeData(char *patientRecordsFile) {
+listNode * storeData(char *patientRecordsFile, uniqueNamesList **headOfUniqueCountries, uniqueNamesList **headOfUniqueDiseases) {
 
     listNode *head = NULL;
     char tmpDateInfo[11];
@@ -179,6 +179,8 @@ listNode * storeData(char *patientRecordsFile) {
                     exit(-1);
                 }
                 sortDateInsert(&head, &tmpRecordPtr);
+                insertUnique(headOfUniqueCountries, tmpRecordPtr->country);
+                insertUnique(headOfUniqueDiseases, tmpRecordPtr->diseaseID);
                 break;
         }
     }
